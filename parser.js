@@ -1,3 +1,4 @@
+console.time('a');
 const fs = require('fs')
 
 const HEADING_1_PATTERN = "^=1= |(?<=\\n|\\t)=1= ";
@@ -11,7 +12,7 @@ const ITALIC_TEXT_PATTERN = "`\/.+\/`";
 const UNDERLINED_TEXT_PATTERN = "`_.+_`";
 const HIGHLIGHTED_TEXT_PATTERN = "`=.+=`";
 const STRIKETHROUGH_TEXT_PATTERN = "`-.+-`";
-const LINKED_TEXT_PATTERN = "`_.+_(.+)`";
+const LINKED_TEXT_PATTERN = "`_.+_\\(.+\\)`";
 const IMAGE_PATTERN = "image:.+{}";
 const NEWLINE_PATTERN = "\\n";
 const INDENT_PATTERN = "\\t";
@@ -31,17 +32,63 @@ function lex(input) {
 			// There is a text token that we need to take care of
 			let token = {type: "TEXT", value: input.substring(last_lexeme_end_index + 1, pattern_match.index)};
 			tokens.push(token);
-			last_lexeme_end_index += pattern_match.index - 1;
+            last_lexeme_end_index = pattern_match.index - 1;
+            // console.log(last_lexeme_end_index);
         }
         
-        // console.log("pattern match: " + pattern_match[0]);
-
-        if (pattern_match[1].match(HEADING_1_PATTERN)) {
-            let lexemes = pattern_match[0].split(/(?= )/g);
-			tokens.push({type: "HEADING 1 INDICATOR", value: lexemes[0]});
-		    tokens.push({type: "NON-PARAGRAPH BLOCK TRIGGER", value: lexemes[1]});
-        } else if (pattern_match[1].match(NEWLINE_PATTERN)) {
-            tokens.push({type: "NEWLINE", value: pattern_match[1]});
+        if (pattern_match[0].match(HEADING_1_PATTERN)) { // or maybe pattern_match[1] != null
+			tokens.push({type: "HEADING 1 MARKUP", value: pattern_match[0]});
+        } else if (pattern_match[0].match(HEADING_2_PATTERN)) {
+			tokens.push({type: "HEADING 2 MARKUP", value: pattern_match[0]});
+        } else if (pattern_match[0].match(HEADING_3_PATTERN)) {
+			tokens.push({type: "HEADING 3 MARKUP", value: pattern_match[0]});
+        } else if (pattern_match[0].match(UNORDERED_LIST_PATTERN)) {
+			tokens.push({type: "UNORDERED LIST MARKUP", value: pattern_match[0]});
+        } else if (pattern_match[0].match(ORDERED_LIST_PATTERN)) {
+			tokens.push({type: "ORDERED LIST MARKUP", value: pattern_match[0]});
+        } else if (pattern_match[0].match(HORIZONTAL_RULE_PATTERN)) {
+			tokens.push({type: "HORIZONTAL RULE MARKUP", value: pattern_match[0]});
+        } else if (pattern_match[0].match(BOLD_TEXT_PATTERN)) {
+            let lexemes = pattern_match[0].split(/(?<=`@)|(?=@`)/g);
+			tokens.push({type: "LEFT BOLD TEXT MARKUP", value: lexemes[0]});
+            tokens.push({type: "TEXT", value: lexemes[1]});
+            tokens.push({type: "RIGHT BOLD TEXT MARKUP", value: lexemes[2]});
+        } else if (pattern_match[0].match(ITALIC_TEXT_PATTERN)) {
+            let lexemes = pattern_match[0].split(/(?<=`\/)|(?=\/`)/g);
+			tokens.push({type: "LEFT ITALIC TEXT MARKUP", value: lexemes[0]});
+            tokens.push({type: "TEXT", value: lexemes[1]});
+            tokens.push({type: "RIGHT ITALIC TEXT MARKUP", value: lexemes[2]});
+        } else if (pattern_match[0].match(UNDERLINED_TEXT_PATTERN)) {
+            let lexemes = pattern_match[0].split(/(?<=`_)|(?=_`)/g);
+			tokens.push({type: "LEFT UNDERLINED TEXT MARKUP", value: lexemes[0]});
+            tokens.push({type: "TEXT", value: lexemes[1]});
+            tokens.push({type: "RIGHT UNDERLINED TEXT MARKUP", value: lexemes[2]});
+        } else if (pattern_match[0].match(HIGHLIGHTED_TEXT_PATTERN)) {
+            let lexemes = pattern_match[0].split(/(?<=`=)|(?==`)/g);
+			tokens.push({type: "LEFT HIGHLIGHTED TEXT MARKUP", value: lexemes[0]});
+            tokens.push({type: "TEXT", value: lexemes[1]});
+            tokens.push({type: "RIGHT HIGHLIGHTED TEXT MARKUP", value: lexemes[2]});
+        } else if (pattern_match[0].match(STRIKETHROUGH_TEXT_PATTERN)) {
+            let lexemes = pattern_match[0].split(/(?<=`-)|(?=-`)/g);
+			tokens.push({type: "LEFT STRIKETHROUGH TEXT MARKUP", value: lexemes[0]});
+            tokens.push({type: "TEXT", value: lexemes[1]});
+            tokens.push({type: "RIGHT STRIKETHROUGH TEXT MARKUP", value: lexemes[2]});
+        } else if (pattern_match[0].match(LINKED_TEXT_PATTERN)) {
+            let lexemes = [...pattern_match[0].split("_(")[0].split(/(?<=`_)/g), "_(", ...pattern_match[0].split("_(")[1].split(/(?=\)`)/g)];
+			tokens.push({type: "LINKED TEXT MARKUP 1", value: lexemes[0]});
+            tokens.push({type: "LINK ALIAS", value: lexemes[1]});
+            tokens.push({type: "LINKED TEXT MARKUP 2", value: lexemes[2]});
+            tokens.push({type: "LINK URL", value: lexemes[3]});
+            tokens.push({type: "LINKED TEXT MARKUP 3", value: lexemes[4]});
+        } else if (pattern_match[0].match(IMAGE_PATTERN)) {
+            let lexemes = pattern_match[0].split(/(?<=image:)|(?={})/g);
+			tokens.push({type: "IMAGE MARKUP 1", value: lexemes[0]});
+            tokens.push({type: "IMAGE PATH", value: lexemes[1]});
+            tokens.push({type: "IMAGE MARKUP 2", value: lexemes[2]});
+        } else if (pattern_match[0].match(NEWLINE_PATTERN)) {
+            tokens.push({type: "NEWLINE", value: pattern_match[0]});
+        } else if (pattern_match[0].match(INDENT_PATTERN)) {
+            tokens.push({type: "INDENT", value: pattern_match[0]});
         }
 
         // switch (pattern_match[1]) {
@@ -52,11 +99,12 @@ function lex(input) {
         //         break;
         // }
 
-        last_lexeme_end_index += pattern_match.index + pattern_match[0].length - 1;
+        last_lexeme_end_index = pattern_match.index + pattern_match[0].length - 1;
+        // console.log(last_lexeme_end_index);
     }
 
     if (last_lexeme_end_index != input.length - 1) {
-		tokens.push({type: "TEXT", value: input.substring(last_lexeme_end_index + 1, input.length)});
+        tokens.push({type: "TEXT", value: input.substring(last_lexeme_end_index + 1, input.length)});
     }
     
     return tokens;
@@ -71,8 +119,16 @@ function concatenate_patterns(patterns) {
 	return concatenated_pattern;
 }
 
-let tokens = lex("=1= A beautiful heading\n");
+let sampleText = "";
 
-for (let token of tokens) {
-    console.log(token.type);
-}
+fs.readFile("sample.txt", (err, data) => {
+    sampleText = data.toString();
+    // console.log(sampleText);
+    let tokens = lex(sampleText);
+
+    // for (let token of tokens) {
+    //     console.log("token type: " + token.type + "; token value: " + token.value);
+    // }
+});
+
+console.timeEnd('a');
