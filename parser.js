@@ -1,6 +1,3 @@
-console.time('a');
-const fs = require('fs')
-
 const HEADING_1_PATTERN = "^=1= |(?<=\\n|\\t)=1= ";
 const HEADING_2_PATTERN = "^=2= |(?<=\\n|\\t)=2= ";
 const HEADING_3_PATTERN = "^=3= |(?<=\\n|\\t)=3= ";
@@ -103,7 +100,7 @@ function lex(input) {
         // console.log(last_lexeme_end_index);
     }
 
-    if (last_lexeme_end_index != input.length - 1) {
+    if (input.length > 0 && last_lexeme_end_index != input.length - 1) {
         tokens.push({type: "TEXT", value: input.substring(last_lexeme_end_index + 1, input.length)});
     }
     
@@ -112,23 +109,11 @@ function lex(input) {
 
 function concatenate_patterns(patterns) {
 	let concatenated_pattern = "";
-	for (pattern of patterns) {
+	for (let pattern of patterns) {
 		concatenated_pattern += "(" + pattern + ")|";
     }
     concatenated_pattern = concatenated_pattern.slice(0, -1);
 	return concatenated_pattern;
 }
 
-let sampleText = "";
-
-fs.readFile("sample.txt", (err, data) => {
-    sampleText = data.toString();
-    // console.log(sampleText);
-    let tokens = lex(sampleText);
-
-    // for (let token of tokens) {
-    //     console.log("token type: " + token.type + "; token value: " + token.value);
-    // }
-});
-
-console.timeEnd('a');
+module.exports = lex;
