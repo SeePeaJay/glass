@@ -18,36 +18,6 @@ const PATTERNS = [HEADING_1_PATTERN, HEADING_2_PATTERN, HEADING_3_PATTERN, UNORD
 
 const concatenated_pattern = new RegExp(concatenate_patterns(PATTERNS), 'g');
 
-const HEADING_1_TOKEN_NAME = 'HEADING 1 MARKUP';
-const HEADING_1_TOKEN_VALUE = '=1= ';
-const HEADING_2_TOKEN_NAME = 'HEADING 2 MARKUP';
-const HEADING_2_TOKEN_VALUE = '=2= ';
-const HEADING_3_TOKEN_NAME = 'HEADING 3 MARKUP';
-const HEADING_3_TOKEN_VALUE = '=3= ';
-const UNORDERED_LIST_TOKEN_NAME = 'UNORDERED LIST MARKUP';
-const UNORDERED_LIST_TOKEN_VALUE = '* ';
-const ORDERED_LIST_TOKEN_NAME = 'ORDERED LIST MARKUP';
-const HORIZONTAL_RULE_TOKEN_NAME = 'HORIZONTAL RULE MARKUP';
-const HORIZONTAL_RULE_TOKEN_VALUE = '--- ';
-const BOLD_TEXT_TOKEN_NAMES = ['LEFT BOLD TEXT MARKUP', 'RIGHT BOLD TEXT MARKUP'];
-const BOLD_TEXT_TOKEN_VALUES = ['`@', '@`'];
-const ITALICIZED_TEXT_TOKEN_NAMES = ['LEFT ITALICIZED TEXT MARKUP', 'RIGHT ITALICIZED TEXT MARKUP'];
-const ITALICIZED_TEXT_TOKEN_VALUES = ['`/', '/`'];
-const UNDERLINED_TEXT_TOKEN_NAMES = ['LEFT UNDERLINED TEXT MARKUP', 'RIGHT UNDERLINED TEXT MARKUP'];
-const UNDERLINED_TEXT_TOKEN_VALUES = ['`_', '_`'];
-const HIGHLIGHTED_TEXT_TOKEN_NAMES = ['LEFT HIGHLIGHTED TEXT MARKUP', 'RIGHT HIGHLIGHTED TEXT MARKUP'];
-const HIGHLIGHTED_TEXT_TOKEN_VALUES = ['`=', '=`'];
-const STRIKETHROUGH_TEXT_TOKEN_NAMES = ['LEFT STRIKETHROUGH TEXT MARKUP', 'RIGHT STRIKETHROUGH TEXT MARKUP'];
-const STRIKETHROUGH_TEXT_TOKEN_VALUES = ['`-', '-`'];
-const LINK_TEXT_TOKEN_NAMES = ['LINK TEXT MARKUP 1', 'LINK ALIAS', 'LINK TEXT MARKUP 2', 'LINK URL', 'LINK TEXT MARKUP 3'];
-const LINK_TEXT_TOKEN_VALUES = ['`_', '_(', ')`'];
-const IMAGE_TOKEN_NAMES = ['IMAGE MARKUP 1', 'IMAGE PATH', 'IMAGE MARKUP 2'];
-const IMAGE_TOKEN_VALUES = ['image:', '{}'];
-const NEWLINE_TOKEN_NAME = 'NEWLINE';
-const NEWLINE_TOKEN_VALUE = '\n';
-const INDENT_TOKEN_NAME = 'INDENT';
-const INDENT_TOKEN_VALUE = '\t';
-
 function lex(input) {
     const tokens = [];
 
@@ -63,58 +33,58 @@ function lex(input) {
         }
         
         if (pattern_match[0].match(HEADING_1_PATTERN)) { // or maybe pattern_match[1] != null
-			tokens.push({name: HEADING_1_TOKEN_NAME, value: HEADING_1_TOKEN_VALUE});
+			tokens.push({name: 'HEADING 1 MARKUP', value: '=1= '});
         } else if (pattern_match[0].match(HEADING_2_PATTERN)) {
-			tokens.push({name: HEADING_2_TOKEN_NAME, value: HEADING_2_TOKEN_VALUE});
+			tokens.push({name: 'HEADING 2 MARKUP', value: '=2= '});
         } else if (pattern_match[0].match(HEADING_3_PATTERN)) {
-			tokens.push({name: HEADING_3_TOKEN_NAME, value: HEADING_3_TOKEN_VALUE});
+			tokens.push({name: 'HEADING 3 MARKUP', value: '=3= '});
         } else if (pattern_match[0].match(UNORDERED_LIST_PATTERN)) {
-			tokens.push({name: UNORDERED_LIST_TOKEN_NAME, value: UNORDERED_LIST_TOKEN_VALUE});
+			tokens.push({name: 'UNORDERED LIST MARKUP', value: '* '});
         } else if (pattern_match[0].match(ORDERED_LIST_PATTERN)) {
-			tokens.push({name: ORDERED_LIST_TOKEN_NAME, value: pattern_match[0]});
+			tokens.push({name: 'ORDERED LIST MARKUP', value: pattern_match[0]});
         } else if (pattern_match[0].match(HORIZONTAL_RULE_PATTERN)) {
-			tokens.push({name: HORIZONTAL_RULE_TOKEN_NAME, value: HORIZONTAL_RULE_TOKEN_VALUE});
+			tokens.push({name: 'HORIZONTAL RULE MARKUP', value: '--- '});
         } else if (pattern_match[0].match(BOLD_TEXT_PATTERN)) {
             let lexemes = pattern_match[0].split(/(?<=`@)|(?=@`)/g);
-			tokens.push({name: BOLD_TEXT_TOKEN_NAMES[0], value: BOLD_TEXT_TOKEN_VALUES[0]});
+			tokens.push({name: 'LEFT BOLD TEXT MARKUP', value: '`@'});
             tokens.push({name: 'TEXT', value: lexemes[1]});
-            tokens.push({name: BOLD_TEXT_TOKEN_NAMES[1], value: BOLD_TEXT_TOKEN_VALUES[1]});
+            tokens.push({name: 'RIGHT BOLD TEXT MARKUP', value: '@`'});
         } else if (pattern_match[0].match(ITALICIZED_TEXT_PATTERN)) {
             let lexemes = pattern_match[0].split(/(?<=`\/)|(?=\/`)/g);
-			tokens.push({name: ITALICIZED_TEXT_TOKEN_NAMES[0], value: ITALICIZED_TEXT_TOKEN_VALUES[0]});
+			tokens.push({name: 'LEFT ITALICIZED TEXT MARKUP', value: '`/'});
             tokens.push({name: 'TEXT', value: lexemes[1]});
-            tokens.push({name: ITALICIZED_TEXT_TOKEN_NAMES[1], value: ITALICIZED_TEXT_TOKEN_VALUES[1]});
+            tokens.push({name: 'RIGHT ITALICIZED TEXT MARKUP', value: '/`'});
         } else if (pattern_match[0].match(UNDERLINED_TEXT_PATTERN)) {
             let lexemes = pattern_match[0].split(/(?<=`_)|(?=_`)/g);
-			tokens.push({name: UNDERLINED_TEXT_TOKEN_NAMES[0], value: UNDERLINED_TEXT_TOKEN_VALUES[0]});
+			tokens.push({name: 'LEFT UNDERLINED TEXT MARKUP', value: '`_'});
             tokens.push({name: 'TEXT', value: lexemes[1]});
-            tokens.push({name: UNDERLINED_TEXT_TOKEN_NAMES[1], value: UNDERLINED_TEXT_TOKEN_VALUES[1]});
+            tokens.push({name: 'RIGHT UNDERLINED TEXT MARKUP', value: '_`'});
         } else if (pattern_match[0].match(HIGHLIGHTED_TEXT_PATTERN)) {
             let lexemes = pattern_match[0].split(/(?<=`=)|(?==`)/g);
-			tokens.push({name: HIGHLIGHTED_TEXT_TOKEN_NAMES[0], value: HIGHLIGHTED_TEXT_TOKEN_VALUES[0]});
+			tokens.push({name: 'LEFT HIGHLIGHTED TEXT MARKUP', value: '`='});
             tokens.push({name: 'TEXT', value: lexemes[1]});
-            tokens.push({name: HIGHLIGHTED_TEXT_TOKEN_NAMES[1], value: HIGHLIGHTED_TEXT_TOKEN_VALUES[1]});
+            tokens.push({name: 'RIGHT HIGHLIGHTED TEXT MARKUP', value: '=`'});
         } else if (pattern_match[0].match(STRIKETHROUGH_TEXT_PATTERN)) {
             let lexemes = pattern_match[0].split(/(?<=`-)|(?=-`)/g);
-			tokens.push({name: STRIKETHROUGH_TEXT_TOKEN_NAMES[0], value: STRIKETHROUGH_TEXT_TOKEN_VALUES[0]});
+			tokens.push({name: 'LEFT STRIKETHROUGH TEXT MARKUP', value: '`-'});
             tokens.push({name: 'TEXT', value: lexemes[1]});
-            tokens.push({name: STRIKETHROUGH_TEXT_TOKEN_NAMES[1], value: STRIKETHROUGH_TEXT_TOKEN_VALUES[1]});
+            tokens.push({name: 'RIGHT STRIKETHROUGH TEXT MARKUP', value: '-`'});
         } else if (pattern_match[0].match(LINK_TEXT_PATTERN)) {
             let lexemes = [...pattern_match[0].split('_(')[0].split(/(?<=`_)/g), '_(', ...pattern_match[0].split('_(')[1].split(/(?=\)`)/g)];
-			tokens.push({name: LINK_TEXT_TOKEN_NAMES[0], value: LINK_TEXT_TOKEN_VALUES[0]});
-            tokens.push({name: LINK_TEXT_TOKEN_NAMES[1], value: lexemes[1]});
-            tokens.push({name: LINK_TEXT_TOKEN_NAMES[2], value: LINK_TEXT_TOKEN_VALUES[1]});
-            tokens.push({name: LINK_TEXT_TOKEN_NAMES[3], value: lexemes[3]});
-            tokens.push({name: LINK_TEXT_TOKEN_NAMES[4], value: LINK_TEXT_TOKEN_VALUES[2]});
+			tokens.push({name: 'LINK TEXT MARKUP 1', value: '`_'});
+            tokens.push({name: 'LINK ALIAS', value: lexemes[1]});
+            tokens.push({name: 'LINK TEXT MARKUP 2', value: '_('});
+            tokens.push({name: 'LINK URL', value: lexemes[3]});
+            tokens.push({name: 'LINK TEXT MARKUP 3', value: ')`'});
         } else if (pattern_match[0].match(IMAGE_PATTERN)) {
             let lexemes = pattern_match[0].split(/(?<=image:)|(?={})/g);
-			tokens.push({name: IMAGE_TOKEN_NAMES[0], value: IMAGE_TOKEN_VALUES[0]});
-            tokens.push({name: IMAGE_TOKEN_NAMES[1], value: lexemes[1]});
-            tokens.push({name: IMAGE_TOKEN_NAMES[2], value: IMAGE_TOKEN_VALUES[1]});
+			tokens.push({name: 'IMAGE MARKUP 1', value: 'image:'});
+            tokens.push({name: 'IMAGE PATH', value: lexemes[1]});
+            tokens.push({name: 'IMAGE MARKUP 2', value: '{}'});
         } else if (pattern_match[0].match(NEWLINE_PATTERN)) {
-            tokens.push({name: NEWLINE_TOKEN_NAME, value: NEWLINE_TOKEN_VALUE});
+            tokens.push({name: 'NEWLINE', value: '\n'});
         } else if (pattern_match[0].match(INDENT_PATTERN)) {
-            tokens.push({name: INDENT_TOKEN_NAME, value: INDENT_TOKEN_VALUE});
+            tokens.push({name: 'INDENT', value: '\t'});
         }
 
         last_lexeme_end_index = pattern_match.index + pattern_match[0].length - 1;
@@ -135,7 +105,5 @@ function concatenate_patterns(patterns) {
     concatenated_pattern = concatenated_pattern.slice(0, -1);
 	return concatenated_pattern;
 }
-
-const TOKEN_NAMES_AND_VALUES = {HEADING_1_TOKEN_NAME, HEADING_1_TOKEN_VALUE, HEADING_2_TOKEN_NAME, HEADING_2_TOKEN_VALUE, HEADING_3_TOKEN_NAME, HEADING_3_TOKEN_VALUE, UNORDERED_LIST_TOKEN_NAME, UNORDERED_LIST_TOKEN_VALUE, ORDERED_LIST_TOKEN_NAME, HORIZONTAL_RULE_TOKEN_NAME, HORIZONTAL_RULE_TOKEN_VALUE, BOLD_TEXT_TOKEN_NAMES, BOLD_TEXT_TOKEN_VALUES, ITALICIZED_TEXT_TOKEN_NAMES, ITALICIZED_TEXT_TOKEN_VALUES, UNDERLINED_TEXT_TOKEN_NAMES, UNDERLINED_TEXT_TOKEN_VALUES, HIGHLIGHTED_TEXT_TOKEN_NAMES, HIGHLIGHTED_TEXT_TOKEN_VALUES, STRIKETHROUGH_TEXT_TOKEN_NAMES, STRIKETHROUGH_TEXT_TOKEN_VALUES, LINK_TEXT_TOKEN_NAMES, LINK_TEXT_TOKEN_VALUES, IMAGE_TOKEN_NAMES, IMAGE_TOKEN_VALUES, NEWLINE_TOKEN_NAME, NEWLINE_TOKEN_VALUE, INDENT_TOKEN_NAME, INDENT_TOKEN_VALUE};
 
 module.exports = lex;
