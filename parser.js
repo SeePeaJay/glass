@@ -25,13 +25,14 @@ function lex(input) {
     let last_lexeme_end_index = -1;
 
     for(let pattern_match of pattern_matches) {
+        // if the pattern match doesn't occur right after the end of the last lexeme (due to the presence of text before said pattern match), we need to add a text token first
         if (pattern_match.index - last_lexeme_end_index != 1) {
-			// There is a text token that we need to take care of
 			let token = {name: 'TEXT', value: input.substring(last_lexeme_end_index + 1, pattern_match.index)};
 			tokens.push(token);
             last_lexeme_end_index = pattern_match.index - 1;
         }
         
+        // add token based on pattern match
         if (pattern_match[0].match(HEADING_1_PATTERN)) { // or maybe pattern_match[1] != null
 			tokens.push({name: 'HEADING 1 MARKUP', value: '=1= '});
         } else if (pattern_match[0].match(HEADING_2_PATTERN)) {
@@ -90,6 +91,7 @@ function lex(input) {
         last_lexeme_end_index = pattern_match.index + pattern_match[0].length - 1;
     }
 
+    // if there is still some text left after the last pattern match, add a final text token
     if (input.length > 0 && last_lexeme_end_index != input.length - 1) {
         tokens.push({name: 'TEXT', value: input.substring(last_lexeme_end_index + 1, input.length)});
     }
