@@ -1,6 +1,5 @@
 // const fs = require('fs')
-export {};
-const lex = require('../src/parser');
+import {lex} from '../src/parser';
 // import lex from './parser.js';
 
 test('empty string', () => {

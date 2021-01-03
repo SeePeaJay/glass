@@ -1,4 +1,6 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.lex = void 0;
 const HEADING_1_PATTERN = '^=1= |(?<=\\n|\\t)=1= ';
 const HEADING_2_PATTERN = '^=2= |(?<=\\n|\\t)=2= ';
 const HEADING_3_PATTERN = '^=3= |(?<=\\n|\\t)=3= ';
@@ -104,6 +106,7 @@ function lex(input) {
     }
     return tokens;
 }
+exports.lex = lex;
 function concatenate_patterns(patterns) {
     let concatenated_pattern = '';
     for (let pattern of patterns) {
@@ -112,4 +115,3 @@ function concatenate_patterns(patterns) {
     concatenated_pattern = concatenated_pattern.slice(0, -1);
     return concatenated_pattern;
 }
-module.exports = lex;

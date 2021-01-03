@@ -108,4 +108,4 @@ function concatenate_patterns(patterns: string[]) {
 	return concatenated_pattern;
 }
 
-module.exports = lex;
+export {lex};
