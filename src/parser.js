@@ -5,19 +5,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const lexer_1 = __importDefault(require("./lexer"));
 class Parser {
-    constructor() {
-        this.input = '';
-        this.lexer = new lexer_1.default(this.input);
-    }
-    parse(input) {
+    constructor(input) {
         this.input = input;
+        this.lexer = new lexer_1.default(this.input);
         this.lookahead = this.lexer.getNextToken();
+    }
+    parse() {
         return this.getEngram();
     }
     getEngram() {
         return {
             name: 'Engram',
-            body: this.getNumericLiteral(),
+            body: this.getLiteral(),
+        };
+    }
+    getLiteral() {
+        if (this.lookahead !== null) {
+            switch (this.lookahead.name) {
+                case 'NUMBER':
+                    return this.getNumericLiteral();
+                case 'STRING':
+                    return this.getStringLiteral();
+                default:
+                    throw new SyntaxError('Literal: unexpected literal production');
+            }
+        }
+        throw new SyntaxError('Literal: unexpected literal production');
+    }
+    getStringLiteral() {
+        const token = this.eat('STRING');
+        return {
+            name: 'StringLiteral',
+            value: token.value.slice(1, -1),
         };
     }
     getNumericLiteral() {

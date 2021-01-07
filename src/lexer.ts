@@ -17,6 +17,10 @@ class Lexer {
         this.cursor = 0;
     }
 
+    isEOF() {
+        return this.cursor === this.input.length;
+    }
+
     hasMoreTokens() {
         return this.cursor < this.input.length;
     }
@@ -28,14 +32,29 @@ class Lexer {
 
         const string = this.input.slice(this.cursor);
 
-        if (!Number.isNaN(string[0])) {
+        if (!Number.isNaN(Number(string[0]))) {
             let number = '';
-            while (!Number.isNaN(string[this.cursor])) {
-                number += string[this.cursor++];
+            while (!Number.isNaN(Number(string[this.cursor]))) {
+                number += string[this.cursor];
+                this.cursor++;
             }
             return {
                 name: 'NUMBER',
                 value: number,
+            };
+        }
+
+        if (string[0] === '"') {
+            let s = '"';
+            this.cursor++;
+            while (string[this.cursor] !== '"' && !this.isEOF()) {
+                s += string[this.cursor];
+                this.cursor++;
+            }
+            s += string[this.cursor];
+            return {
+                name: 'STRING',
+                value: s,
             };
         }
 

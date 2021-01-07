@@ -7,15 +7,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // import lex from '../src/parser';
 // import lex from './parser.js';
 const parser_1 = __importDefault(require("../src/parser"));
-test('one', () => {
-    const parser = new parser_1.default();
-    const input = '42';
-    const ast = parser.parse(input);
-    expect(ast).toStrictEqual({
-        name: 'NumericLiteral',
-        value: 42,
-    });
-});
+const input = '"42"';
+const parser = new parser_1.default(input);
+const ast = parser.parse();
+console.log(JSON.stringify(ast, null, 2));
+// test('one', () => {
+//     const input = '42';
+//     const parser = new Parser(input);
+//     const ast = parser.parse();
+//     expect(ast).toStrictEqual({
+//         name: 'NumericLiteral',
+//         value: 42,
+//     });
+// });
 // test('empty string', () => {
 //     expect(lex('')).toStrictEqual([]);
 // });

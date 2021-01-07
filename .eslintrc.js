@@ -13,6 +13,7 @@ module.exports = {
         {'exceptAfterSingleLine': true},
     ],
     'max-len': 'off',
+    'no-console': 'off',
     'no-plusplus': 'off',
     'no-tabs': 'off',
     'no-useless-escape': 'off'

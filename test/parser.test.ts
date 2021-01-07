@@ -3,15 +3,21 @@
 // import lex from './parser.js';
 import Parser from '../src/parser';
 
-test('one', () => {
-    const parser = new Parser();
-    const input = '42';
-    const ast = parser.parse(input);
-    expect(ast).toStrictEqual({
-        name: 'NumericLiteral',
-        value: 42,
-    });
-});
+const input = '"42"';
+const parser = new Parser(input);
+const ast = parser.parse();
+
+console.log(JSON.stringify(ast, null, 2));
+
+// test('one', () => {
+//     const input = '42';
+//     const parser = new Parser(input);
+//     const ast = parser.parse();
+//     expect(ast).toStrictEqual({
+//         name: 'NumericLiteral',
+//         value: 42,
+//     });
+// });
 
 // test('empty string', () => {
 //     expect(lex('')).toStrictEqual([]);
