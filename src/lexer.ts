@@ -7,6 +7,7 @@
 // const lexer = {
 //     cursor: 0,
 // };
+// import { Token } from './types';
 
 class Lexer {
     input: string;
@@ -17,7 +18,7 @@ class Lexer {
         this.cursor = 0;
     }
 
-    isEOF() {
+    isEoF() {
         return this.cursor === this.input.length;
     }
 
@@ -47,7 +48,7 @@ class Lexer {
         if (string[0] === '"') {
             let s = '"';
             this.cursor++;
-            while (string[this.cursor] !== '"' && !this.isEOF()) {
+            while (string[this.cursor] !== '"' && !this.isEoF()) {
                 s += string[this.cursor];
                 this.cursor++;
             }

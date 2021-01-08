@@ -1,9 +1,5 @@
 import Lexer from './lexer';
-
-type Token = {
-    name: string,
-    value: string,
-};
+import { Token } from './types';
 
 class Parser {
     input: string;
