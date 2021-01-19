@@ -1,0 +1,20 @@
+=== Ideally, all, but obviously not possible.
+
+A wicked problem ... really depending on the context. That said, a couple pointers could help ...
+
+So it comes down to what to focus on ...:
+    
+    The amount and quality of unit testing to be done in a project is directly proportional to the pace of development and the required stability of the product.
+    
+    jk 
+ok jkk
+
+ok test the code
+    
+    Only test the code that you want to work. - https://stackoverflow.com/a/65743
+    
+    Usually stray away from testing private ... https://softwareengineering.stackexchange.com/questions/380287/why-is-unit-testing-private-methods-considered-as-bad-practice?noredirect=1&lq=1
+
+https://softwareengineering.stackexchange.com/a/375866
+
+Related:: What is unit testing?

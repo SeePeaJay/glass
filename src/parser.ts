@@ -6,13 +6,16 @@ class Parser {
     lexer: Lexer;
     lookahead: Token | null;
 
-    constructor(input: string) {
-        this.input = input;
-        this.lexer = new Lexer(this.input);
-        this.lookahead = this.lexer.getNextToken();
+    constructor() {
+        this.input = '';
+        this.lexer = new Lexer();
+        this.lookahead = null;
     }
 
-    parse() {
+    parse(input: string) {
+        this.input = input;
+        this.lexer.setInput(this.input);
+        this.lookahead = this.lexer.getNextToken();
         return this.getEngram();
     }
 

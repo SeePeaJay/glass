@@ -1,0 +1,29 @@
+Aug 24th, 2020
+=== 
+
+=1= Here is a heading
+
+Does this look ok?
+
+I am not too sure, so we’ll just type a couple words here.
+
+=2= Here is a heading
+Now,
+
+=3= Is this more readable? I have no idea
+
+H_2 I hope it does ...
+
+
+=2= Here is another
+
+
+Naming
+
+=1= So
+
+Does the following still feel included but separated?
+
+--- 
+
+=2= Another smaller
