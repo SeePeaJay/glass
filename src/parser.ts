@@ -2,19 +2,19 @@ import Lexer from './lexer';
 import { Token } from './types';
 
 class Parser {
-    input: string;
+    userInput: string;
     lexer: Lexer;
     lookahead: Token | null;
 
     constructor() {
-        this.input = '';
+        this.userInput = '';
         this.lexer = new Lexer();
         this.lookahead = null;
     }
 
     parse(input: string) {
-        this.input = input;
-        this.lexer.setInput(this.input);
+        this.userInput = input;
+        this.lexer.processUserInput(this.userInput);
         this.lookahead = this.lexer.getNextToken();
         return this.getEngram();
     }
