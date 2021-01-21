@@ -1,16 +1,19 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-// const fs = require('fs')
+// import fs from 'fs';
 // import lex from '../src/parser';
 // import lex from './parser.js';
-const parser_1 = __importDefault(require("../src/parser"));
-const input = '"42"';
-const parser = new parser_1.default(input);
-const ast = parser.parse();
-console.log(JSON.stringify(ast, null, 2));
+// import Parser from '../src/parser';
+// const input = '"42"';
+// const parser = new Parser(input);
+// const ast = parser.parse();
+// console.log(JSON.stringify(ast, null, 2));
+// fs.readFileSync('sample.txt', (data: Buffer) => {
+//     console.log(data.toString());
+// const tokens = lex(data.toString());
+// for (let token of tokens) {
+//     console.log("token name: " + token.name + "; token value: " + token.value);
+// }
+// });
 // test('one', () => {
 //     const input = '42';
 //     const parser = new Parser(input);
@@ -112,11 +115,4 @@ console.log(JSON.stringify(ast, null, 2));
 //         const array = [{ name: 'TEXT', value: 'A paragraph with an indent: ' }, { name: 'INDENT', value: '\t' }, { name: 'TEXT', value: '.' }];
 //         expect(lex('A paragraph with an indent: \t.')).toStrictEqual(array);
 //     });
-// });
-// fs.readFileSync("sample.txt", (err, data) => {
-//     // console.log(sampleText);
-//     let tokens = lex(data.toString());
-//     for (let token of tokens) {
-//         console.log("token name: " + token.name + "; token value: " + token.value);
-//     }
 // });

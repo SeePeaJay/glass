@@ -1,156 +1,182 @@
 "use strict";
-// class Lexer {
-//     init(string) {
-//         this._string = string;
-//         this._cursor = 0;
-//     }
-// }
-// const lexer = {
-//     cursor: 0,
-// };
 Object.defineProperty(exports, "__esModule", { value: true });
 class Lexer {
-    constructor(input) {
-        this.input = input;
+    constructor() {
+        this.BLOCK_MARKUPS_PATTERN = '^(=1= |=2= |=3= |\\* |\\d+\\. |--- )';
+        this.userInput = '';
         this.cursor = 0;
+        this.lastCursorPosition = 0;
+        this.isAtStartofBlock = true;
+        this.currentIndentLevel = 0;
+        this.maxIndentLevel = 0;
+        // this.isLastBlockIndented = false;
+        this.tokenQueue = [];
+        this.lastTokenCreated = null;
+        this.blocksAndTriggers = [];
     }
-    isEOF() {
-        return this.cursor === this.input.length;
+    processUserInput(input) {
+        this.userInput = input;
+        this.splitUserInputIntoBlocksAndTriggers(this.userInput);
+    }
+    // splitUserInputIntoBlocks?
+    splitUserInputIntoBlocksAndTriggers(input) {
+        const firstSplit = input.split(/(?<=\n\t+.*)(\n)/g);
+        for (let i = 0; i < firstSplit.length; i += 2) {
+            const secondSplit = firstSplit[i].split(/(\n\n\t+|\n\n|\n\t+)/g);
+            this.blocksAndTriggers.push(...secondSplit);
+            if (i + 1 < firstSplit.length) {
+                this.blocksAndTriggers.push(firstSplit[i + 1]);
+            }
+        }
+    }
+    isEoF() {
+        return this.cursor === this.userInput.length;
     }
     hasMoreTokens() {
-        return this.cursor < this.input.length;
+        return this.cursor < this.userInput.length;
     }
     getNextToken() {
-        if (!this.hasMoreTokens()) {
-            return null;
-        }
-        const string = this.input.slice(this.cursor);
-        if (!Number.isNaN(Number(string[0]))) {
-            let number = '';
-            while (!Number.isNaN(Number(string[this.cursor]))) {
-                number += string[this.cursor];
-                this.cursor++;
+        if (this.isEoF()) {
+            if (this.lastTokenCreated === null || !['NEWLINE', 'NEW BLOCK TRIGGER', 'NEW INDENTED BLOCK TRIGGER'].includes(this.lastTokenCreated.name)) {
+                return null;
             }
             return {
-                name: 'NUMBER',
-                value: number,
+                name: 'BLANK LINE',
+                value: '',
             };
         }
-        if (string[0] === '"') {
-            let s = '"';
-            this.cursor++;
-            while (string[this.cursor] !== '"' && !this.isEOF()) {
-                s += string[this.cursor];
-                this.cursor++;
-            }
-            s += string[this.cursor];
-            return {
-                name: 'STRING',
-                value: s,
-            };
+        if (this.tokenQueue.length) {
+            return this.tokenQueue.shift();
         }
-        return null;
+        return {
+            name: 'BLANK LINE',
+            value: '',
+        };
+        // return this.getTokenFromEngram();
+        // if (this.input.substring(this.cursor).startsWith('\n\n\t') || this.input.substring(this.cursor).startsWith('\n\t')) {
+        //     let newIndentedBlockTriggerToken: Token;
+        //     this.lastCursorPosition = this.cursor;
+        //     if (this.input.substring(this.cursor).startsWith('\n\n\t')) {
+        //         this.cursor += 3;
+        //         newIndentedBlockTriggerToken = {
+        //             name: 'NEW INDENTED BLOCK TRIGGER',
+        //             value: '\\n\\n\\t',
+        //         };
+        //     } else {
+        //         this.cursor += 2;
+        //         newIndentedBlockTriggerToken = {
+        //             name: 'NEW INDENTED BLOCK TRIGGER',
+        //             value: '\\n\\t',
+        //         };
+        //     }
+        //     this.isAtStartofBlock = true;
+        //     this.currentIndentLevel = 1;
+        //     while (this.input.substring(this.cursor).startsWith('\t')) {
+        //         this.cursor++;
+        //         if (this.currentIndentLevel <= this.maxIndentLevel) {
+        //             this.currentIndentLevel++;
+        //             newIndentedBlockTriggerToken.value += '\\t';
+        //         }
+        //     }
+        //     this.maxIndentLevel = this.currentIndentLevel + 1;
+        //     this.isLastBlockIndented = true;
+        //     if (this.lastCursorPosition === 0) {
+        //         this.tokenQueue.push(newIndentedBlockTriggerToken);
+        //         const blankLineToken = {
+        //             name: 'BLANK LINE',
+        //             value: '',
+        //         };
+        //         this.lastTokenCreated = blankLineToken;
+        //         return blankLineToken;
+        //     }
+        //     this.lastTokenCreated = newIndentedBlockTriggerToken;
+        //     return newIndentedBlockTriggerToken;
+        // }
+        // if (this.input.substring(this.cursor).startsWith('\n\n') || (this.isLastBlockIndented && this.input.substring(this.cursor).startsWith('\n'))) {
+        //     let newBlockTriggerToken: Token;
+        //     this.lastCursorPosition = this.cursor;
+        //     if (this.input.substring(this.cursor).startsWith('\n\n')) {
+        //         this.cursor += 2;
+        //         newBlockTriggerToken = {
+        //             name: 'NEW BLOCK TRIGGER',
+        //             value: '\\n\\n',
+        //         };
+        //     } else {
+        //         this.cursor++;
+        //         newBlockTriggerToken = {
+        //             name: 'NEW BLOCK TRIGGER',
+        //             value: '\\n',
+        //         };
+        //     }
+        //     this.isAtStartofBlock = true;
+        //     this.currentIndentLevel = 0;
+        //     this.maxIndentLevel = 1;
+        //     this.isLastBlockIndented = false;
+        //     if (this.lastCursorPosition === 0) {
+        //         this.tokenQueue.push(newBlockTriggerToken);
+        //         const blankLineToken = {
+        //             name: 'BLANK LINE',
+        //             value: '',
+        //         };
+        //         this.lastTokenCreated = blankLineToken;
+        //         return blankLineToken;
+        //     }
+        //     this.lastTokenCreated = newBlockTriggerToken;
+        //     return newBlockTriggerToken;
+        // }
+        // // getBlockMarkupToken?
+        // if (this.isAtStartofBlock && this.input.substring(this.cursor).match(this.BLOCK_MARKUPS_PATTERN)) {
+        //     let blockMarkupToken: Token;
+        //     this.lastCursorPosition = this.cursor;
+        //     if (this.input.startsWith('=1= ')) {
+        //         this.cursor += 4;
+        //         blockMarkupToken = {
+        //             name: 'HEADING 1 MARKUP',
+        //             value: '=1= ',
+        //         };
+        //     } else if (this.input.startsWith('=2= ')) {
+        //         this.cursor += 4;
+        //         blockMarkupToken = {
+        //             name: 'HEADING 2 MARKUP',
+        //             value: '=2= ',
+        //         };
+        //     } else if (this.input.startsWith('=3= ')) {
+        //         this.cursor += 4;
+        //         blockMarkupToken = {
+        //             name: 'HEADING 3 MARKUP',
+        //             value: '=3= ',
+        //         };
+        //     } else if (this.input.startsWith('* ')) {
+        //         this.cursor += 2;
+        //         blockMarkupToken = {
+        //             name: 'UNORDERED LIST MARKUP',
+        //             value: '* ',
+        //         };
+        //     } else if (this.input.match('^\\d+.')) {
+        //         const lexeme = this.input.match('^\\d+.')![0];
+        //         this.cursor += lexeme.length;
+        //         blockMarkupToken = {
+        //             name: 'ORDERED LIST MARKUP',
+        //             value: lexeme,
+        //         };
+        //     } else {
+        //         this.cursor += 4;
+        //         blockMarkupToken = {
+        //             name: 'HORIZONTAL RULE MARKUP',
+        //             value: '--- ',
+        //         };
+        //     }
+        //     this.isAtStartofBlock = false;
+        //     return blockMarkupToken;
+        // }
+    }
+    getTokenFromEngram() {
+        this.userInput = '';
+        return this.getTokenFromText();
+    }
+    getTokenFromText() {
+        this.userInput = '';
+        return [];
     }
 }
 exports.default = Lexer;
-// export default lexer;
-// const HEADING_1_PATTERN = '^=1= |(?<=\\n|\\t)=1= ';
-// const HEADING_2_PATTERN = '^=2= |(?<=\\n|\\t)=2= ';
-// const HEADING_3_PATTERN = '^=3= |(?<=\\n|\\t)=3= ';
-// const UNORDERED_LIST_PATTERN = '^\\* |(?<=\\n|\\t)\\* ';
-// const ORDERED_LIST_PATTERN = '^\\d+\\. |(?<=\\n|\\t)\\d+\\. ';
-// const HORIZONTAL_RULE_PATTERN = '^--- |(?<=\\n|\\t)--- ';
-// const BOLD_TEXT_PATTERN = '`@.+@`';
-// const ITALICIZED_TEXT_PATTERN = '`\/.+\/`';
-// const UNDERLINED_TEXT_PATTERN = '`_.+_`';
-// const HIGHLIGHTED_TEXT_PATTERN = '`=.+=`';
-// const STRIKETHROUGH_TEXT_PATTERN = '`-.+-`';
-// const LINK_TEXT_PATTERN = '`_.+_\\(.+\\)`';
-// const IMAGE_PATTERN = 'image:.+{}';
-// const NEWLINE_PATTERN = '\\n';
-// const INDENT_PATTERN = '\\t';
-// const PATTERNS = [HEADING_1_PATTERN, HEADING_2_PATTERN, HEADING_3_PATTERN, UNORDERED_LIST_PATTERN, ORDERED_LIST_PATTERN, HORIZONTAL_RULE_PATTERN, BOLD_TEXT_PATTERN, ITALICIZED_TEXT_PATTERN, UNDERLINED_TEXT_PATTERN, HIGHLIGHTED_TEXT_PATTERN, STRIKETHROUGH_TEXT_PATTERN, LINK_TEXT_PATTERN, IMAGE_PATTERN, NEWLINE_PATTERN, INDENT_PATTERN];
-// function concatenatePattern(patterns: string[]) {
-//     let concatenatedPattern = '';
-//     patterns.forEach((pattern) => {
-//         concatenatedPattern += `(${pattern})|`;
-//      });
-//     concatenatedPattern = concatenatedPattern.slice(0, -1);
-// 	return concatenatedPattern;
-// }
-// const concatenatedPattern = new RegExp(concatenatePattern(PATTERNS), 'g');
-// function lex(input: string) {
-//     const tokens = [];
-//     const patternMatches = Array.from(input.matchAll(concatenatedPattern));
-//     let lastLexemeEndIndex = -1;
-//     patternMatches.forEach((patternMatch) => {
-//         // if the pattern match doesn't occur right after the end of the last lexeme (due to the presence of text before said pattern match), we need to add a text token first
-//         if (patternMatch.index! - lastLexemeEndIndex !== 1) {
-// 			const token = { name: 'TEXT', value: input.substring(lastLexemeEndIndex + 1, patternMatch.index) };
-// 			tokens.push(token);
-//             lastLexemeEndIndex = patternMatch.index! - 1;
-//         }
-//         // add token based on pattern match
-//         if (patternMatch[0].match(HEADING_1_PATTERN)) { // or maybe patternMatch[1] != null
-// 			tokens.push({ name: 'HEADING 1 MARKUP', value: '=1= ' });
-//         } else if (patternMatch[0].match(HEADING_2_PATTERN)) {
-// 			tokens.push({ name: 'HEADING 2 MARKUP', value: '=2= ' });
-//         } else if (patternMatch[0].match(HEADING_3_PATTERN)) {
-// 			tokens.push({ name: 'HEADING 3 MARKUP', value: '=3= ' });
-//         } else if (patternMatch[0].match(UNORDERED_LIST_PATTERN)) {
-// 			tokens.push({ name: 'UNORDERED LIST MARKUP', value: '* ' });
-//         } else if (patternMatch[0].match(ORDERED_LIST_PATTERN)) {
-// 			tokens.push({ name: 'ORDERED LIST MARKUP', value: patternMatch[0] });
-//         } else if (patternMatch[0].match(HORIZONTAL_RULE_PATTERN)) {
-// 			tokens.push({ name: 'HORIZONTAL RULE MARKUP', value: '--- ' });
-//         } else if (patternMatch[0].match(BOLD_TEXT_PATTERN)) {
-//             const lexemes = patternMatch[0].split(/(?<=`@)|(?=@`)/g);
-// 			tokens.push({ name: 'LEFT BOLD TEXT MARKUP', value: '`@' });
-//             tokens.push({ name: 'TEXT', value: lexemes[1] });
-//             tokens.push({ name: 'RIGHT BOLD TEXT MARKUP', value: '@`' });
-//         } else if (patternMatch[0].match(ITALICIZED_TEXT_PATTERN)) {
-//             const lexemes = patternMatch[0].split(/(?<=`\/)|(?=\/`)/g);
-// 			tokens.push({ name: 'LEFT ITALICIZED TEXT MARKUP', value: '`/' });
-//             tokens.push({ name: 'TEXT', value: lexemes[1] });
-//             tokens.push({ name: 'RIGHT ITALICIZED TEXT MARKUP', value: '/`' });
-//         } else if (patternMatch[0].match(UNDERLINED_TEXT_PATTERN)) {
-//             const lexemes = patternMatch[0].split(/(?<=`_)|(?=_`)/g);
-// 			tokens.push({ name: 'LEFT UNDERLINED TEXT MARKUP', value: '`_' });
-//             tokens.push({ name: 'TEXT', value: lexemes[1] });
-//             tokens.push({ name: 'RIGHT UNDERLINED TEXT MARKUP', value: '_`' });
-//         } else if (patternMatch[0].match(HIGHLIGHTED_TEXT_PATTERN)) {
-//             const lexemes = patternMatch[0].split(/(?<=`=)|(?==`)/g);
-// 			tokens.push({ name: 'LEFT HIGHLIGHTED TEXT MARKUP', value: '`=' });
-//             tokens.push({ name: 'TEXT', value: lexemes[1] });
-//             tokens.push({ name: 'RIGHT HIGHLIGHTED TEXT MARKUP', value: '=`' });
-//         } else if (patternMatch[0].match(STRIKETHROUGH_TEXT_PATTERN)) {
-//             const lexemes = patternMatch[0].split(/(?<=`-)|(?=-`)/g);
-// 			tokens.push({ name: 'LEFT STRIKETHROUGH TEXT MARKUP', value: '`-' });
-//             tokens.push({ name: 'TEXT', value: lexemes[1] });
-//             tokens.push({ name: 'RIGHT STRIKETHROUGH TEXT MARKUP', value: '-`' });
-//         } else if (patternMatch[0].match(LINK_TEXT_PATTERN)) {
-//             const lexemes = [...patternMatch[0].split('_(')[0].split(/(?<=`_)/g), '_(', ...patternMatch[0].split('_(')[1].split(/(?=\)`)/g)];
-// 			tokens.push({ name: 'LINK TEXT MARKUP 1', value: '`_' });
-//             tokens.push({ name: 'LINK ALIAS', value: lexemes[1] });
-//             tokens.push({ name: 'LINK TEXT MARKUP 2', value: '_(' });
-//             tokens.push({ name: 'LINK URL', value: lexemes[3] });
-//             tokens.push({ name: 'LINK TEXT MARKUP 3', value: ')`' });
-//         } else if (patternMatch[0].match(IMAGE_PATTERN)) {
-//             const lexemes = patternMatch[0].split(/(?<=image:)|(?={})/g);
-// 			tokens.push({ name: 'IMAGE MARKUP 1', value: 'image:' });
-//             tokens.push({ name: 'IMAGE PATH', value: lexemes[1] });
-//             tokens.push({ name: 'IMAGE MARKUP 2', value: '{}' });
-//         } else if (patternMatch[0].match(NEWLINE_PATTERN)) {
-//             tokens.push({ name: 'NEWLINE', value: '\n' });
-//         } else if (patternMatch[0].match(INDENT_PATTERN)) {
-//             tokens.push({ name: 'INDENT', value: '\t' });
-//         }
-//         lastLexemeEndIndex = patternMatch.index! + patternMatch[0].length - 1;
-//      });
-//     // if there is still some text left after the last pattern match, add a final text token
-//     if (input.length > 0 && lastLexemeEndIndex !== input.length - 1) {
-//         tokens.push({ name: 'TEXT', value: input.substring(lastLexemeEndIndex + 1, input.length) });
-//     }
-//     return tokens;
-// }
-// export default lex;

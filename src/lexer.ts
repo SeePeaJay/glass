@@ -13,7 +13,7 @@ class Lexer {
     tokenQueue: Token[];
     lastTokenCreated: Token | null;
 
-    processedUserInput: string[];
+    blocksAndTriggers: string[];
 
     constructor() {
         this.userInput = '';
@@ -26,21 +26,22 @@ class Lexer {
         this.tokenQueue = [];
         this.lastTokenCreated = null;
 
-        this.processedUserInput = [];
+        this.blocksAndTriggers = [];
     }
 
     processUserInput(input: string) {
         this.userInput = input;
-        this.setProcessedUserInput(this.userInput);
+        this.splitUserInputIntoBlocksAndTriggers(this.userInput);
     }
 
-    setProcessedUserInput(input: string) {
+    // splitUserInputIntoBlocks?
+    splitUserInputIntoBlocksAndTriggers(input: string) {
         const firstSplit = input.split(/(?<=\n\t+.*)(\n)/g);
         for (let i = 0; i < firstSplit.length; i += 2) {
             const secondSplit = firstSplit[i].split(/(\n\n\t+|\n\n|\n\t+)/g);
-            this.processedUserInput.push(...secondSplit);
+            this.blocksAndTriggers.push(...secondSplit);
             if (i + 1 < firstSplit.length) {
-                this.processedUserInput.push(firstSplit[i + 1]);
+                this.blocksAndTriggers.push(firstSplit[i + 1]);
             }
         }
     }

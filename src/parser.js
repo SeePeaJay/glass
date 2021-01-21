@@ -5,12 +5,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const lexer_1 = __importDefault(require("./lexer"));
 class Parser {
-    constructor(input) {
-        this.input = input;
-        this.lexer = new lexer_1.default(this.input);
-        this.lookahead = this.lexer.getNextToken();
+    constructor() {
+        this.userInput = '';
+        this.lexer = new lexer_1.default();
+        this.lookahead = null;
     }
-    parse() {
+    parse(input) {
+        this.userInput = input;
+        this.lexer.processUserInput(this.userInput);
+        this.lookahead = this.lexer.getNextToken();
         return this.getEngram();
     }
     getEngram() {
