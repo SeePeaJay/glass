@@ -20,12 +20,17 @@ class Lexer {
     }
     // splitUserInputIntoBlocks?
     splitUserInputIntoBlocksAndTriggers(input) {
-        const firstSplit = input.split(/(?<=\n\t+.*)(\n)/g);
-        for (let i = 0; i < firstSplit.length; i += 2) {
-            const secondSplit = firstSplit[i].split(/(\n\n\t+|\n\n|\n\t+)/g);
-            this.blocksAndTriggers.push(...secondSplit);
-            if (i + 1 < firstSplit.length) {
-                this.blocksAndTriggers.push(firstSplit[i + 1]);
+        if (input.match(/^(\n\n|\n\n\t+|\n|\n\t+)$/g)) {
+            this.blocksAndTriggers.push('', input, '');
+        }
+        else {
+            const firstSplit = input.split(/(?<=\n\t+.*)(\n)(?!\n|\t)/g);
+            for (let i = 0; i < firstSplit.length; i += 2) {
+                const secondSplit = firstSplit[i].split(/(\n\n\t+|\n\n|\n\t+)/g);
+                this.blocksAndTriggers.push(...secondSplit);
+                if (i + 1 < firstSplit.length) {
+                    this.blocksAndTriggers.push(firstSplit[i + 1]);
+                }
             }
         }
     }
