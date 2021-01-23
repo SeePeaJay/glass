@@ -35,18 +35,23 @@ class Lexer {
 		this.removeUnnecessaryTabsFromBlocksAndTriggers();
     }
 
-    // splitUserInputIntoBlocks?
     splitUserInputIntoBlocksAndTriggers(input: string) {
 		if (input.match(/^(\n\n|\n\n\t+|\n|\n\t+)$/g)) {
 			this.blocksAndTriggers.push('', input, '');
 		} else {
-			const firstSplit = input.split(/(?<=\n\t+.*)(\n)(?!\n|\t)/g);
-			for (let i = 0; i < firstSplit.length; i += 2) {
-				const secondSplit = firstSplit[i].split(/(\n\n\t+|\n\n|\n\t+)/g);
-				this.blocksAndTriggers.push(...secondSplit);
-				if (i + 1 < firstSplit.length) {
-					this.blocksAndTriggers.push(firstSplit[i + 1]);
+			const firstSplit = input.split(/(\n)(?=$)/g); // split the final \n, if present
+			const secondSplit = firstSplit[0].split(/(?<=\n\t+.*)(\n)(?!\n|\t)/g); // split \n after indneted block
+			for (let i = 0; i < secondSplit.length; i += 2) {
+				const thirdSplit = secondSplit[i].split(/(\n\n\t+|\n\n|\n\t+)/g); // split any instances of new (indented) block trigger
+				this.blocksAndTriggers.push(...thirdSplit);
+				if (i + 1 < secondSplit.length) {
+					this.blocksAndTriggers.push(secondSplit[i + 1]);
 				}
+			}
+			if (firstSplit.length > 1) {
+				const blocksAndTriggers = [...firstSplit];
+				blocksAndTriggers.shift();
+				this.blocksAndTriggers.push(...blocksAndTriggers);
 			}
 		}
 	}
