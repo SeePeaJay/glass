@@ -31,7 +31,8 @@ class Lexer {
 
     processUserInput(input: string) {
         this.userInput = input;
-        this.splitUserInputIntoBlocksAndTriggers(this.userInput);
+		this.splitUserInputIntoBlocksAndTriggers(this.userInput);
+		this.removeUnnecessaryTabsFromBlocksAndTriggers();
     }
 
     // splitUserInputIntoBlocks?
@@ -48,7 +49,13 @@ class Lexer {
 				}
 			}
 		}
-    }
+	}
+
+	removeUnnecessaryTabsFromBlocksAndTriggers() {
+		for (let i = 0; i < this.blocksAndTriggers.length; i += 2) {
+			this.blocksAndTriggers[i] = this.blocksAndTriggers[i].replace(/\t+/g, '');
+		}
+	}
 
     isEoF() {
         return this.cursor === this.userInput.length;
