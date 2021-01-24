@@ -36,24 +36,8 @@ class Lexer {
     }
 
     splitUserInputIntoBlocksAndTriggers(input: string) {
-		if (input.match(/^(\n\n|\n\n\t+|\n|\n\t+)$/g)) {
-			this.blocksAndTriggers.push('', input, '');
-		} else {
-			const firstSplit = input.split(/(\n)(?=$)/g); // split the final \n, if present
-			const secondSplit = firstSplit[0].split(/(?<=\n\t+.*)(\n)(?!\n|\t)/g); // split \n after indneted block
-			for (let i = 0; i < secondSplit.length; i += 2) {
-				const thirdSplit = secondSplit[i].split(/(\n\n\t+|\n\n|\n\t+)/g); // split any instances of new (indented) block trigger
-				this.blocksAndTriggers.push(...thirdSplit);
-				if (i + 1 < secondSplit.length) {
-					this.blocksAndTriggers.push(secondSplit[i + 1]);
-				}
-			}
-			if (firstSplit.length > 1) {
-				const blocksAndTriggers = [...firstSplit];
-				blocksAndTriggers.shift();
-				this.blocksAndTriggers.push(...blocksAndTriggers);
-			}
-		}
+		const split = input.split(/(\n\n\t+|\n\n|\n\t+|(?<=\n\t+.*)\n(?!\n|\t)|(?<=\n\n)\n|^\n|\n$)/g); // split any instances of new (indented) block trigger
+		this.blocksAndTriggers.push(...split);
 	}
 
 	removeUnnecessaryTabsFromBlocksAndTriggers() {

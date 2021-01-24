@@ -45,7 +45,15 @@ describe('splitUserInputIntoBlocksAndTriggers tests', () => {
 		const lexer = new Lexer();
 		const input = '\nThis is a standard paragraph.';
 		lexer.processUserInput(input);
-		const array = ['\nThis is a standard paragraph.'];
+		const array = ['', '\n', 'This is a standard paragraph.'];
+        expect(lexer.blocksAndTriggers).toStrictEqual(array);
+	});
+
+	test('new block trigger followed by paragraph', () => {
+		const lexer = new Lexer();
+		const input = '\n\nThis is a standard paragraph.';
+		lexer.processUserInput(input);
+		const array = ['', '\n\n', 'This is a standard paragraph.'];
         expect(lexer.blocksAndTriggers).toStrictEqual(array);
 	});
 
@@ -62,6 +70,14 @@ describe('splitUserInputIntoBlocksAndTriggers tests', () => {
 		const input = 'This is a standard paragraph.\n\nThis is another paragraph.\n\nOne final paragraph.\n';
 		lexer.processUserInput(input);
 		const array = ['This is a standard paragraph.', '\n\n', 'This is another paragraph.', '\n\n', 'One final paragraph.', '\n', ''];
+        expect(lexer.blocksAndTriggers).toStrictEqual(array);
+	});
+
+	test('end with new block trigger', () => {
+		const lexer = new Lexer();
+		const input = 'This is a standard paragraph.\n\nThis is another paragraph.\n\nOne final paragraph.\n\n';
+		lexer.processUserInput(input);
+		const array = ['This is a standard paragraph.', '\n\n', 'This is another paragraph.', '\n\n', 'One final paragraph.', '\n\n', ''];
         expect(lexer.blocksAndTriggers).toStrictEqual(array);
 	});
 
