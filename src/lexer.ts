@@ -7,8 +7,6 @@ class Lexer {
     cursor: number;
     lastCursorPosition: number;
     isAtStartofBlock: boolean;
-    currentIndentLevel: number;
-    maxIndentLevel: number;
     // isLastBlockIndented: boolean;
     tokenQueue: Token[];
     lastTokenCreated: Token | null;
@@ -18,13 +16,11 @@ class Lexer {
     constructor() {
         this.userInput = '';
         this.cursor = 0;
-        this.lastCursorPosition = 0;
-        this.isAtStartofBlock = true;
-        this.currentIndentLevel = 0;
-        this.maxIndentLevel = 0;
+        this.lastCursorPosition = 0; // no need?
+        this.isAtStartofBlock = true; // no need?
         // this.isLastBlockIndented = false;
         this.tokenQueue = [];
-        this.lastTokenCreated = null;
+        this.lastTokenCreated = null; // no need?
 
         this.blocksAndTriggers = [];
     }
@@ -33,6 +29,7 @@ class Lexer {
         this.userInput = input;
 		this.splitUserInputIntoBlocksAndTriggers(this.userInput);
 		this.removeUnnecessaryTabsFromBlocksAndTriggers();
+		// process tabs in blocksandtriggers here? Make sure indent levels are ok
     }
 
     splitUserInputIntoBlocksAndTriggers(input: string) {
@@ -41,8 +38,24 @@ class Lexer {
 	}
 
 	removeUnnecessaryTabsFromBlocksAndTriggers() {
-		for (let i = 0; i < this.blocksAndTriggers.length; i += 2) {
-			this.blocksAndTriggers[i] = this.blocksAndTriggers[i].replace(/\t+/g, '');
+		let maxIndentLevel = 1;
+		for (let i = 1; i < this.blocksAndTriggers.length; i += 2) {
+			if (this.blocksAndTriggers[i].includes('\t')) {
+				const split = this.blocksAndTriggers[i].split(/(\n)/g);
+				const tabCharacters = split[2];
+				if (tabCharacters.length <= maxIndentLevel) {
+					this.blocksAndTriggers[i] = split.join();
+				} else {
+					const array = [split[0], split[1], '\t'.repeat(maxIndentLevel)];
+					this.blocksAndTriggers[i] = array.join();
+				}
+			} else {
+				maxIndentLevel = 1;
+			}
+		}
+
+		for (let j = 0; j < this.blocksAndTriggers.length; j += 2) {
+			this.blocksAndTriggers[j] = this.blocksAndTriggers[j].replace(/\t+/g, '');
 		}
 	}
 

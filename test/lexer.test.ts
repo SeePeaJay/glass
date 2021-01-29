@@ -57,6 +57,22 @@ describe('splitUserInputIntoBlocksAndTriggers tests', () => {
         expect(lexer.blocksAndTriggers).toStrictEqual(array);
 	});
 
+	test('newlines within paragraph', () => {
+		const lexer = new Lexer();
+		const input = 'This is a single paragraph\nwith two newlines\n.';
+		lexer.processUserInput(input);
+		const array = ['This is a single paragraph\nwith two newlines\n.'];
+        expect(lexer.blocksAndTriggers).toStrictEqual(array);
+	});
+
+	test('tabs within paragraph', () => {
+		const lexer = new Lexer();
+		const input = 'This is a normal paragraph, with one tab character 	.';
+		lexer.processUserInput(input);
+		const array = ['This is a normal paragraph, with one tab character .'];
+        expect(lexer.blocksAndTriggers).toStrictEqual(array);
+	});
+
 	test('\\n after indented block', () => {
 		const lexer = new Lexer();
 		const input = 'This is a standard paragraph.\n\n\tAnd this paragraph is indented.\nBack to normal.';
@@ -78,22 +94,6 @@ describe('splitUserInputIntoBlocksAndTriggers tests', () => {
 		const input = 'This is a standard paragraph.\n\nThis is another paragraph.\n\nOne final paragraph.\n\n';
 		lexer.processUserInput(input);
 		const array = ['This is a standard paragraph.', '\n\n', 'This is another paragraph.', '\n\n', 'One final paragraph.', '\n\n', ''];
-        expect(lexer.blocksAndTriggers).toStrictEqual(array);
-	});
-
-	test('newlines within paragraph', () => {
-		const lexer = new Lexer();
-		const input = 'This is a single paragraph\nwith two newlines\n.';
-		lexer.processUserInput(input);
-		const array = ['This is a single paragraph\nwith two newlines\n.'];
-        expect(lexer.blocksAndTriggers).toStrictEqual(array);
-	});
-
-	test('tabs within paragraph', () => {
-		const lexer = new Lexer();
-		const input = 'This is a normal paragraph, with one tab character 	.';
-		lexer.processUserInput(input);
-		const array = ['This is a normal paragraph, with one tab character .'];
         expect(lexer.blocksAndTriggers).toStrictEqual(array);
 	});
 });
