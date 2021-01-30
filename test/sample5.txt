@@ -1,11 +1,3 @@
+Here is a normal paragraph.
 
-So yeah.
-
-Don't know what happend, but hopefully everything will be ok.
-
-Stuff
-
-Jk
-
-
-hi
+									But this paragraph is preceded by unnecessary tab characters.

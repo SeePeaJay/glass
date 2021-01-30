@@ -26,7 +26,7 @@ class Lexer {
     }
 
     processUserInput(input: string) {
-        this.userInput = input;
+		this.userInput = input;
 		this.splitUserInputIntoBlocksAndTriggers(this.userInput);
 		this.removeUnnecessaryTabsFromBlocksAndTriggers();
 		// process tabs in blocksandtriggers here? Make sure indent levels are ok
@@ -41,13 +41,11 @@ class Lexer {
 		let maxIndentLevel = 1;
 		for (let i = 1; i < this.blocksAndTriggers.length; i += 2) {
 			if (this.blocksAndTriggers[i].includes('\t')) {
-				const split = this.blocksAndTriggers[i].split(/(\n)/g);
+				const split = this.blocksAndTriggers[i].split(/(\n)(?!\n)/g);
 				const tabCharacters = split[2];
-				if (tabCharacters.length <= maxIndentLevel) {
-					this.blocksAndTriggers[i] = split.join();
-				} else {
+				if (tabCharacters.length > maxIndentLevel) {
 					const array = [split[0], split[1], '\t'.repeat(maxIndentLevel)];
-					this.blocksAndTriggers[i] = array.join();
+					this.blocksAndTriggers[i] = array.join('');
 				}
 			} else {
 				maxIndentLevel = 1;

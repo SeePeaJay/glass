@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lexer_1 = __importDefault(require("../src/lexer"));
-describe('splitUserInputIntoBlocksAndTriggers tests', () => {
+describe('splitUserInputIntoBlocksAndTriggers() tests', () => {
     test('empty string input', () => {
         const lexer = new lexer_1.default();
         const input = '';
@@ -54,6 +54,13 @@ describe('splitUserInputIntoBlocksAndTriggers tests', () => {
         const array = ['', '\n\n', 'This is a standard paragraph.'];
         expect(lexer.blocksAndTriggers).toStrictEqual(array);
     });
+    test('newlines within paragraph', () => {
+        const lexer = new lexer_1.default();
+        const input = 'This is a single paragraph\nwith two newlines\n.';
+        lexer.processUserInput(input);
+        const array = ['This is a single paragraph\nwith two newlines\n.'];
+        expect(lexer.blocksAndTriggers).toStrictEqual(array);
+    });
     test('\\n after indented block', () => {
         const lexer = new lexer_1.default();
         const input = 'This is a standard paragraph.\n\n\tAnd this paragraph is indented.\nBack to normal.';
@@ -75,18 +82,27 @@ describe('splitUserInputIntoBlocksAndTriggers tests', () => {
         const array = ['This is a standard paragraph.', '\n\n', 'This is another paragraph.', '\n\n', 'One final paragraph.', '\n\n', ''];
         expect(lexer.blocksAndTriggers).toStrictEqual(array);
     });
-    test('newlines within paragraph', () => {
-        const lexer = new lexer_1.default();
-        const input = 'This is a single paragraph\nwith two newlines\n.';
-        lexer.processUserInput(input);
-        const array = ['This is a single paragraph\nwith two newlines\n.'];
-        expect(lexer.blocksAndTriggers).toStrictEqual(array);
-    });
-    test('tabs within paragraph', () => {
-        const lexer = new lexer_1.default();
-        const input = 'This is a normal paragraph, with one tab character 	.';
-        lexer.processUserInput(input);
-        const array = ['This is a normal paragraph, with one tab character .'];
-        expect(lexer.blocksAndTriggers).toStrictEqual(array);
+    describe('removeUnnecessaryTabsFromBlocksAndTriggers() tests', () => {
+        test('a normally indented block', () => {
+            const lexer = new lexer_1.default();
+            const input = 'This is a normal paragraph.\n\n\tAnd a normally indented paragraph.';
+            lexer.processUserInput(input);
+            const array = ['This is a normal paragraph.', '\n\n\t', 'And a normally indented paragraph.'];
+            expect(lexer.blocksAndTriggers).toStrictEqual(array);
+        });
+        test('tabs within paragraph', () => {
+            const lexer = new lexer_1.default();
+            const input = 'This is a normal paragraph, with one tab character 	.';
+            lexer.processUserInput(input);
+            const array = ['This is a normal paragraph, with one tab character .'];
+            expect(lexer.blocksAndTriggers).toStrictEqual(array);
+        });
+        test('indented block preceded by unnecessary tabs', () => {
+            const lexer = new lexer_1.default();
+            const input = 'This is a normal paragraph.\n\n\t\t\t\t\tBut this paragraph is preceded by 5 tabs';
+            lexer.processUserInput(input);
+            const array = ['This is a normal paragraph.', '\n\n\t', 'But this paragraph is preceded by 5 tabs'];
+            expect(lexer.blocksAndTriggers).toStrictEqual(array);
+        });
     });
 });
