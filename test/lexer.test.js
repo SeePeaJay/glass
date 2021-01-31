@@ -106,3 +106,16 @@ describe('splitUserInputIntoBlocksAndTriggers() tests', () => {
         });
     });
 });
+describe('actual lexer tests', () => {
+    test('empty string input', () => {
+        const lexer = new lexer_1.default();
+        const input = '';
+        const receivedTokens = [];
+        lexer.processUserInput(input);
+        while (lexer.getNextToken()) {
+            receivedTokens.push(lexer.getNextToken());
+        }
+        const expectedTokens = [];
+        expect(receivedTokens).toStrictEqual(expectedTokens);
+    });
+});

@@ -1,4 +1,5 @@
 import Lexer from '../src/lexer';
+import { Token } from '../src/types';
 
 describe('splitUserInputIntoBlocksAndTriggers() tests', () => {
     test('empty string input', () => {
@@ -113,5 +114,19 @@ describe('splitUserInputIntoBlocksAndTriggers() tests', () => {
 			const array = ['This is a normal paragraph.', '\n\n\t', 'But this paragraph is preceded by 5 tabs'];
 			expect(lexer.blocksAndTriggers).toStrictEqual(array);
 		});
+	});
+});
+
+describe('actual lexer tests', () => {
+	test('empty string input', () => {
+		const lexer = new Lexer();
+		const input = '';
+		const receivedTokens: Token[] = [];
+		lexer.processUserInput(input);
+		while (lexer.getNextToken()) {
+			receivedTokens.push(lexer.getNextToken()!);
+		}
+		const expectedTokens: Token[] = [];
+		expect(receivedTokens).toStrictEqual(expectedTokens);
 	});
 });
