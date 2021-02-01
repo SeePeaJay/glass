@@ -15,6 +15,10 @@ class Lexer {
 
     processUserInput(input: string) {
 		this.userInput = input;
+		this.blocksAndTriggers = [];
+		this.cursor = [0, 0];
+		this.tokenQueue = [];
+
 		this.splitUserInputIntoBlocksAndTriggers(this.userInput);
 		this.removeUnnecessaryTabsFromBlocksAndTriggers();
 		// process tabs in blocksandtriggers here
@@ -46,125 +50,123 @@ class Lexer {
 	}
 
     isEoF() {
-        return this.cursor[1] === this.blocksAndTriggers[this.blocksAndTriggers.length - 1].length;
+        return (this.cursor[0] === this.blocksAndTriggers.length) && (this.cursor[1] === this.blocksAndTriggers[this.cursor[0] - 1].length);
     }
 
     getNextToken() {
-		if ((this.blocksAndTriggers.length === 1 && this.blocksAndTriggers[0] === '') || this.isEoF()) {
-			return null;
-		}
-
 		if (this.tokenQueue.length) {
 			return this.tokenQueue.shift()!;
+		}
+
+		if ((this.blocksAndTriggers.length === 1 && this.blocksAndTriggers[0] === '') || this.isEoF()) {
+			return null;
 		}
 
 		return this.getTokenFromEngram();
     }
 
     getTokenFromEngram() {
+		// block triggers
+		if (this.cursor[0] % 2) {
+			return this.getTokenFromBlockTrigger();
+		}
+
+		// block markups
+		const blockMarkupMatch = this.blocksAndTriggers[this.cursor[0]].substring(this.cursor[1]).match(/^(=1= |=2= |=3= |\* |\d+. |--- )/);
+		if (blockMarkupMatch) {
+			return this.getTokenFromBlockMarkup(blockMarkupMatch[0]);
+		}
+
+		// images/hybrid
+		const imageMarkupMatch = this.blocksAndTriggers[this.cursor[0]].substring(this.cursor[1]).match(/^image:.+{}/);
+		if (imageMarkupMatch) {
+			return this.getTokenFromImageMarkup(imageMarkupMatch[0]);
+		}
+
+		// remaining text
+		const remainingText = this.blocksAndTriggers[this.cursor[0]].substring(this.cursor[1]);
+		const remainingTokensInCurrentBlock = this.getTokensFromRemainingText(remainingText);
+		const token = remainingTokensInCurrentBlock.shift()!;
+		this.tokenQueue.push(...remainingTokensInCurrentBlock);
+		return token;
+	}
+
+	getTokenFromBlockTrigger() {
 		let token: Token;
 
-		if (this.cursor[0] % 2) { // block triggers
-			if (this.blocksAndTriggers[this.cursor[0]].includes('\t')) {
+		if (this.blocksAndTriggers[this.cursor[0]].includes('\t')) {
 				token = {
 					name: 'NEW INDENTED BLOCK TRIGGER',
 					value: this.blocksAndTriggers[this.cursor[0]],
 				};
-			}
-			token = {
-				name: 'NEW BLOCK TRIGGER',
-				value: this.blocksAndTriggers[this.cursor[0]],
-			};
-
-			this.cursor[0]++;
-			this.cursor[1] = 0;
-
-			return token;
 		}
+		token = {
+			name: 'NEW BLOCK TRIGGER',
+			value: this.blocksAndTriggers[this.cursor[0]],
+		};
 
-		if (this.cursor[1] === 0) { // block markups
-			if (this.blocksAndTriggers[this.cursor[0]].startsWith('=1= ')) {
-				token = {
-					name: 'HEADING 1 MARKUP',
-					value: '=1= ',
-				};
-				this.cursor[1] += 4;
-				return token;
-			}
+		this.cursor[0]++;
+		this.cursor[1] = 0;
 
-			if (this.blocksAndTriggers[this.cursor[0]].startsWith('=2= ')) {
-				token = {
-					name: 'HEADING 2 MARKUP',
-					value: '=2= ',
-				};
-				this.cursor[1] += 4;
-				return token;
-			}
-
-			if (this.blocksAndTriggers[this.cursor[0]].startsWith('=3= ')) {
-				token = {
-					name: 'HEADING 3 MARKUP',
-					value: '=3= ',
-				};
-				this.cursor[1] += 4;
-				return token;
-			}
-
-			if (this.blocksAndTriggers[this.cursor[0]].startsWith('* ')) {
-				token = {
-					name: 'UNORDERED LIST MARKUP',
-					value: '* ',
-				};
-				this.cursor[1] += 2;
-				return token;
-			}
-
-			if (this.blocksAndTriggers[this.cursor[0]].match(/\d+. /)) {
-				const lexeme = this.blocksAndTriggers[this.cursor[0]].match(/\d+. /)![0];
-				token = {
-					name: 'ORDERED LIST MARKUP',
-					value: lexeme,
-				};
-				this.cursor[1] += lexeme.length;
-				return token;
-			}
-
-			if (this.blocksAndTriggers[this.cursor[0]].startsWith('--- ')) {
-				token = {
-					name: 'HORIZONTAL RULE MARKUP',
-					value: '--- ',
-				};
-				this.cursor[1] += 2;
-				return token;
-			}
-		}
-
-		if (this.blocksAndTriggers[this.cursor[0]].substring(this.cursor[1]).match(/^image:.+{}/)) { // images
-			let matchedString = '';
-			[matchedString] = this.blocksAndTriggers[this.cursor[0]].substring(this.cursor[1]).match(/image:.+{}/)!;
-			const lexemes = matchedString.split(/(?<=image:)|(?={})/g);
-			token = {
-				name: 'IMAGE MARKUP 1',
-				value: lexemes[0],
-			};
-			const remainingTokens = [
-				...this.getTokensFromRemainingText(lexemes[1]),
-				{
-					name: 'IMAGE MARKUP 2',
-					value: lexemes[2],
-				},
-			];
-			this.tokenQueue.push(...remainingTokens);
-			this.cursor[1] += matchedString.length;
-			return token;
-		}
-
-		const remainingText = this.blocksAndTriggers[this.cursor[0]].substring(this.cursor[1]);
-		const remainingTokensInCurrentBlock = this.getTokensFromRemainingText(remainingText);
-		token = remainingTokensInCurrentBlock.shift()!;
-		this.tokenQueue.push(...remainingTokensInCurrentBlock);
 		return token;
-    }
+	}
+
+	getTokenFromBlockMarkup(blockMarkup: string) {
+		let token: Token;
+
+		if (blockMarkup === '=1= ') {
+			token = {
+				name: 'HEADING 1 MARKUP',
+				value: '=1= ',
+			};
+		} else if (blockMarkup === '=2= ') {
+			token = {
+				name: 'HEADING 2 MARKUP',
+				value: '=2= ',
+			};
+		} else if (blockMarkup === '=3= ') {
+			token = {
+				name: 'HEADING 3 MARKUP',
+				value: '=3= ',
+			};
+		} else if (blockMarkup === '* ') {
+			token = {
+				name: 'UNORDERED LIST MARKUP',
+				value: '* ',
+			};
+		} else if (blockMarkup.match(/\d+. /)) {
+			token = {
+				name: 'ORDERED LIST MARKUP',
+				value: blockMarkup,
+			};
+		} else {
+			token = {
+				name: 'HORIZONTAL RULE MARKUP',
+				value: '--- ',
+			};
+		}
+
+		this.cursor[1] += blockMarkup.length;
+		return token;
+	}
+
+	getTokenFromImageMarkup(imageMarkup: string) {
+		const lexemes = imageMarkup.split(/(?<=image:)|(?={})/g);
+		const token = {
+			name: 'IMAGE MARKUP 1',
+			value: lexemes[0],
+		};
+		const remainingTokens = [
+			...this.getTokensFromRemainingText(lexemes[1]),
+			{
+				name: 'IMAGE MARKUP 2',
+				value: lexemes[2],
+			},
+		];
+		this.tokenQueue.push(...remainingTokens);
+		this.cursor[1] += lexemes[0].length + lexemes[2].length;
+		return token;
+	}
 
     getTokensFromRemainingText(remainingText: string): Token[] {
 		let lexemes;
@@ -185,6 +187,7 @@ class Lexer {
 					value: '@`',
 				},
 			];
+			this.cursor[1] += lexemes[0].length + lexemes[2].length;
 		} else if (remainingText.match(/^`\/.+\/`/)) {
 			[matchedString] = remainingText.match(/^`\/.+\/`/)!;
 			lexemes = remainingText.match(/^`\/.+\/`/)![0].split(/(?<=`\/)|(?=\/`)/g);
@@ -199,6 +202,7 @@ class Lexer {
 					value: '/`',
 				},
 			];
+			this.cursor[1] += lexemes[0].length + lexemes[2].length;
 		} else if (remainingText.match(/^`_.+_`/)) {
 			[matchedString] = remainingText.match(/^`_.+_`/)!;
 			lexemes = remainingText.match(/^`_.+_`/)![0].split(/(?<=`_)|(?=_`)/g);
@@ -213,6 +217,7 @@ class Lexer {
 					value: '_`',
 				},
 			];
+			this.cursor[1] += lexemes[0].length + lexemes[2].length;
 		} else if (remainingText.match(/^`=.+=`/)) {
 			[matchedString] = remainingText.match(/^`=.+=`/)!;
 			lexemes = remainingText.match(/^`=.+=`/)![0].split(/(?<=`=)|(?==`)/g);
@@ -227,6 +232,7 @@ class Lexer {
 					value: '=`',
 				},
 			];
+			this.cursor[1] += lexemes[0].length + lexemes[2].length;
 		} else if (remainingText.match(/^`-.+-`/)) {
 			[matchedString] = remainingText.match(/^`-.+-`/)!;
 			lexemes = remainingText.match(/^`-.+-`/)![0].split(/(?<=`-)|(?=-`)/g);
@@ -241,9 +247,10 @@ class Lexer {
 					value: '-`',
 				},
 			];
+			this.cursor[1] += lexemes[0].length + lexemes[2].length;
 		} else if (remainingText.match(/^`_.+_\(.+\)`/)) {
 			[matchedString] = remainingText.match(/^`_.+_\(.+\)`/)!;
-			const firstSplit = matchedString.split(/_\(/g);
+			const firstSplit = matchedString.split(/_(\()/g);
 			const secondSplit = firstSplit[0].split(/(?<=`_)/g);
 			const thirdSplit = firstSplit[2].split(/(?=\)`)/g);
 			lexemes = [...secondSplit, '_(', ...thirdSplit];
@@ -263,25 +270,24 @@ class Lexer {
 					value: ')`',
 				},
 			];
+			this.cursor[1] += lexemes[0].length + lexemes[2].length + lexemes[4].length;
 		} else if (remainingText.length === 1) {
-			matchedString = remainingText;
 			tokens = [
 				{
 					name: 'NON-CONTROL CHARACTER',
 					value: remainingText,
 				},
 			];
+			this.cursor[1] += remainingText.length;
 		} else {
-			matchedString = remainingText;
 			tokens = [
 				{
 					name: 'NON-CONTROL CHARACTERS',
 					value: remainingText,
 				},
 			];
+			this.cursor[1] += remainingText.length;
 		}
-
-		this.cursor[1] += matchedString.length;
 
 		return tokens;
     }
