@@ -50,6 +50,10 @@ class Lexer {
 	}
 
     isEoF() {
+		if (this.blocksAndTriggers.length === 1 && this.cursor[1] === this.blocksAndTriggers[0].length) {
+			this.cursor[0]++;
+		}
+
         return (this.cursor[0] === this.blocksAndTriggers.length) && (this.cursor[1] === this.blocksAndTriggers[this.cursor[0] - 1].length);
     }
 
