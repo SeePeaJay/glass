@@ -470,4 +470,106 @@ describe('tests on correct production of token(s)', () => {
 		];
 		expect(receivedTokens).toStrictEqual(expectedTokens);
 	});
+
+	test('a single new block trigger', () => {
+		const input = '=1= A heading\n\nA standard paragraph.';
+		const receivedTokens: Token[] = [];
+		lexer.processUserInput(input);
+		let token = lexer.getNextToken();
+		while (token) {
+			receivedTokens.push(token!);
+			token = lexer.getNextToken();
+		}
+		const expectedTokens: Token[] = [
+			{
+				name: 'HEADING 1 MARKUP',
+				value: '=1= ',
+			},
+			{
+				name: 'NON-CONTROL CHARACTERS',
+				value: 'A heading',
+			},
+			{
+				name: 'NEW BLOCK TRIGGER',
+				value: '\n\n',
+			},
+			{
+				name: 'NON-CONTROL CHARACTERS',
+				value: 'A standard paragraph.',
+			},
+		];
+		expect(receivedTokens).toStrictEqual(expectedTokens);
+	});
+
+	test('a single new indented block trigger', () => {
+		const input = '=1= A heading\n\n\tAn indented paragraph.';
+		const receivedTokens: Token[] = [];
+		lexer.processUserInput(input);
+		let token = lexer.getNextToken();
+		while (token) {
+			receivedTokens.push(token!);
+			token = lexer.getNextToken();
+		}
+		const expectedTokens: Token[] = [
+			{
+				name: 'HEADING 1 MARKUP',
+				value: '=1= ',
+			},
+			{
+				name: 'NON-CONTROL CHARACTERS',
+				value: 'A heading',
+			},
+			{
+				name: 'NEW INDENTED BLOCK TRIGGER',
+				value: '\n\n\t',
+			},
+			{
+				name: 'NON-CONTROL CHARACTERS',
+				value: 'An indented paragraph.',
+			},
+		];
+		expect(receivedTokens).toStrictEqual(expectedTokens);
+	});
+
+	// test('nested styles', () => {
+	// 	const input = '`@Styles can be `/nested/`.@`';
+	// 	const receivedTokens: Token[] = [];
+	// 	lexer.processUserInput(input);
+	// 	let token = lexer.getNextToken();
+	// 	while (token) {
+	// 		receivedTokens.push(token!);
+	// 		token = lexer.getNextToken();
+	// 	}
+	// 	const expectedTokens: Token[] = [
+	// 		{
+	// 			name: 'LEFT BOLD TEXT MARKUP',
+	// 			value: '`@',
+	// 		},
+	// 		{
+	// 			name: 'NON-CONTROL CHARACTERS',
+	// 			value: 'Styles can be ',
+	// 		},
+	// 		{
+	// 			name: 'LEFT ITALIC TEXT MARKUP',
+	// 			value: '`/',
+	// 		},
+	// 		{
+	// 			name: 'NON-CONTROL CHARACTERS',
+	// 			value: 'nested',
+	// 		},
+	// 		{
+	// 			name: 'RIGHT ITALIC TEXT MARKUP',
+	// 			value: '/`',
+	// 		},
+	// 		{
+	// 			name: 'NON-CONTROL CHARACTER',
+	// 			value: '.',
+	// 		},
+	// 		{
+	// 			name: 'RIGHT BOLD TEXT MARKUP',
+	// 			value: '@`',
+	// 		},
+	// 	];
+	// 	expect(receivedTokens).toStrictEqual(expectedTokens);
+	// });
 });

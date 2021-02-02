@@ -40,10 +40,7 @@ class Lexer {
         }
     }
     isEoF() {
-        if (this.blocksAndTriggers.length === 1 && this.cursor[1] === this.blocksAndTriggers[0].length) {
-            this.cursor[0]++;
-        }
-        return (this.cursor[0] === this.blocksAndTriggers.length) && (this.cursor[1] === this.blocksAndTriggers[this.cursor[0] - 1].length);
+        return this.cursor[0] === this.blocksAndTriggers.length;
     }
     getNextToken() {
         if (this.tokenQueue.length) {
@@ -84,12 +81,13 @@ class Lexer {
                 value: this.blocksAndTriggers[this.cursor[0]],
             };
         }
-        token = {
-            name: 'NEW BLOCK TRIGGER',
-            value: this.blocksAndTriggers[this.cursor[0]],
-        };
-        this.cursor[0]++;
-        this.cursor[1] = 0;
+        else {
+            token = {
+                name: 'NEW BLOCK TRIGGER',
+                value: this.blocksAndTriggers[this.cursor[0]],
+            };
+        }
+        this.adjustCursor(true, 0);
         return token;
     }
     getTokenFromBlockMarkup(blockMarkup) {
@@ -130,7 +128,7 @@ class Lexer {
                 value: '--- ',
             };
         }
-        this.cursor[1] += blockMarkup.length;
+        this.adjustCursor(false, blockMarkup.length);
         return token;
     }
     getTokenFromImageMarkup(imageMarkup) {
@@ -147,7 +145,7 @@ class Lexer {
             },
         ];
         this.tokenQueue.push(...remainingTokens);
-        this.cursor[1] += lexemes[0].length + lexemes[2].length;
+        this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
         return token;
     }
     getTokensFromRemainingText(remainingText) {
@@ -168,7 +166,7 @@ class Lexer {
                     value: '@`',
                 },
             ];
-            this.cursor[1] += lexemes[0].length + lexemes[2].length;
+            this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
         }
         else if (remainingText.match(/^`\/.+\/`/)) {
             [matchedString] = remainingText.match(/^`\/.+\/`/);
@@ -184,7 +182,7 @@ class Lexer {
                     value: '/`',
                 },
             ];
-            this.cursor[1] += lexemes[0].length + lexemes[2].length;
+            this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
         }
         else if (remainingText.match(/^`_.+_`/)) {
             [matchedString] = remainingText.match(/^`_.+_`/);
@@ -200,7 +198,7 @@ class Lexer {
                     value: '_`',
                 },
             ];
-            this.cursor[1] += lexemes[0].length + lexemes[2].length;
+            this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
         }
         else if (remainingText.match(/^`=.+=`/)) {
             [matchedString] = remainingText.match(/^`=.+=`/);
@@ -216,7 +214,7 @@ class Lexer {
                     value: '=`',
                 },
             ];
-            this.cursor[1] += lexemes[0].length + lexemes[2].length;
+            this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
         }
         else if (remainingText.match(/^`-.+-`/)) {
             [matchedString] = remainingText.match(/^`-.+-`/);
@@ -232,7 +230,7 @@ class Lexer {
                     value: '-`',
                 },
             ];
-            this.cursor[1] += lexemes[0].length + lexemes[2].length;
+            this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
         }
         else if (remainingText.match(/^`_.+_\(.+\)`/)) {
             [matchedString] = remainingText.match(/^`_.+_\(.+\)`/);
@@ -256,7 +254,7 @@ class Lexer {
                     value: ')`',
                 },
             ];
-            this.cursor[1] += lexemes[0].length + lexemes[2].length + lexemes[4].length;
+            this.adjustCursor(false, lexemes[0].length + lexemes[2].length + lexemes[4].length);
         }
         else if (remainingText.length === 1) {
             tokens = [
@@ -265,7 +263,7 @@ class Lexer {
                     value: remainingText,
                 },
             ];
-            this.cursor[1] += remainingText.length;
+            this.adjustCursor(false, remainingText.length);
         }
         else {
             tokens = [
@@ -274,9 +272,20 @@ class Lexer {
                     value: remainingText,
                 },
             ];
-            this.cursor[1] += remainingText.length;
+            this.adjustCursor(false, remainingText.length);
         }
         return tokens;
+    }
+    adjustCursor(shouldIncrement, offset) {
+        if (shouldIncrement) {
+            this.cursor[0]++;
+            this.cursor[1] = 0;
+        }
+        this.cursor[1] += offset;
+        if (this.cursor[1] === this.blocksAndTriggers[this.cursor[0]].length) {
+            this.cursor[0]++;
+            this.cursor[1] = 0;
+        }
     }
 }
 exports.default = Lexer;
