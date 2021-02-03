@@ -1,5 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const markup_tokens_1 = require("./markup_tokens");
+// const HEADING_1_MARKUP_PATTERN = /=1= /;
+// const HEADING_2_MARKUP_PATTERN = /=2= /;
+// const HEADING_3_MARKUP_PATTERN = /=3= /;
+// const ORDERED_LIST_MARKUP_PATTERN = /\* /;
+// const UNORDERED_LIST_MARKUP_PATTERN = /\d+. /;
+// const HORIZONTAL_RULE_MARKUP_PATTERN = /--- /;
+// const IMAGE_PATTERN = /image:.+{}/;
 class Lexer {
     constructor() {
         this.userInput = '';
@@ -92,29 +100,17 @@ class Lexer {
     }
     getTokenFromBlockMarkup(blockMarkup) {
         let token;
-        if (blockMarkup === '=1= ') {
-            token = {
-                name: 'HEADING 1 MARKUP',
-                value: '=1= ',
-            };
+        if (blockMarkup === markup_tokens_1.HEADING_1_MARKUP_TOKEN.value) {
+            token = markup_tokens_1.HEADING_1_MARKUP_TOKEN;
         }
-        else if (blockMarkup === '=2= ') {
-            token = {
-                name: 'HEADING 2 MARKUP',
-                value: '=2= ',
-            };
+        else if (blockMarkup === markup_tokens_1.HEADING_2_MARKUP_TOKEN.value) {
+            token = markup_tokens_1.HEADING_2_MARKUP_TOKEN;
         }
-        else if (blockMarkup === '=3= ') {
-            token = {
-                name: 'HEADING 3 MARKUP',
-                value: '=3= ',
-            };
+        else if (blockMarkup === markup_tokens_1.HEADING_3_MARKUP_TOKEN.value) {
+            token = markup_tokens_1.HEADING_3_MARKUP_TOKEN;
         }
         else if (blockMarkup === '* ') {
-            token = {
-                name: 'UNORDERED LIST MARKUP',
-                value: '* ',
-            };
+            token = markup_tokens_1.UNORDERED_LIST_MARKUP_TOKEN;
         }
         else if (blockMarkup.match(/\d+. /)) {
             token = {
@@ -123,26 +119,17 @@ class Lexer {
             };
         }
         else {
-            token = {
-                name: 'HORIZONTAL RULE MARKUP',
-                value: '--- ',
-            };
+            token = markup_tokens_1.HORIZONTAL_RULE_MARKUP_TOKEN;
         }
         this.adjustCursor(false, blockMarkup.length);
         return token;
     }
     getTokenFromImageMarkup(imageMarkup) {
         const lexemes = imageMarkup.split(/(?<=image:)|(?={})/g);
-        const token = {
-            name: 'IMAGE MARKUP 1',
-            value: lexemes[0],
-        };
+        const token = markup_tokens_1.IMAGE_MARKUP_1_TOKEN;
         const remainingTokens = [
             ...this.getTokensFromRemainingText(lexemes[1]),
-            {
-                name: 'IMAGE MARKUP 2',
-                value: lexemes[2],
-            },
+            markup_tokens_1.IMAGE_MARKUP_2_TOKEN,
         ];
         this.tokenQueue.push(...remainingTokens);
         this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
@@ -156,15 +143,9 @@ class Lexer {
             [matchedString] = remainingText.match(/^`@.+@`/);
             lexemes = matchedString.split(/(?<=`@)|(?=@`)/g);
             tokens = [
-                {
-                    name: 'LEFT BOLD TEXT MARKUP',
-                    value: '`@',
-                },
+                markup_tokens_1.LEFT_BOLD_TEXT_MARKUP_TOKEN,
                 ...this.getTokensFromRemainingText(lexemes[1]),
-                {
-                    name: 'RIGHT BOLD TEXT MARKUP',
-                    value: '@`',
-                },
+                markup_tokens_1.RIGHT_BOLD_TEXT_MARKUP_TOKEN,
             ];
             this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
         }
@@ -172,15 +153,9 @@ class Lexer {
             [matchedString] = remainingText.match(/^`\/.+\/`/);
             lexemes = remainingText.match(/^`\/.+\/`/)[0].split(/(?<=`\/)|(?=\/`)/g);
             tokens = [
-                {
-                    name: 'LEFT ITALIC TEXT MARKUP',
-                    value: '`/',
-                },
+                markup_tokens_1.LEFT_ITALIC_TEXT_MARKUP_TOKEN,
                 ...this.getTokensFromRemainingText(lexemes[1]),
-                {
-                    name: 'RIGHT ITALIC TEXT MARKUP',
-                    value: '/`',
-                },
+                markup_tokens_1.RIGHT_ITALIC_TEXT_MARKUP_TOKEN,
             ];
             this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
         }
@@ -188,15 +163,9 @@ class Lexer {
             [matchedString] = remainingText.match(/^`_.+_`/);
             lexemes = remainingText.match(/^`_.+_`/)[0].split(/(?<=`_)|(?=_`)/g);
             tokens = [
-                {
-                    name: 'LEFT UNDERLINED TEXT MARKUP',
-                    value: '`_',
-                },
+                markup_tokens_1.LEFT_UNDERLINED_TEXT_MARKUP_TOKEN,
                 ...this.getTokensFromRemainingText(lexemes[1]),
-                {
-                    name: 'RIGHT UNDERLINED TEXT MARKUP',
-                    value: '_`',
-                },
+                markup_tokens_1.RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN,
             ];
             this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
         }
@@ -204,15 +173,9 @@ class Lexer {
             [matchedString] = remainingText.match(/^`=.+=`/);
             lexemes = remainingText.match(/^`=.+=`/)[0].split(/(?<=`=)|(?==`)/g);
             tokens = [
-                {
-                    name: 'LEFT HIGHLIGHTED TEXT MARKUP',
-                    value: '`=',
-                },
+                markup_tokens_1.LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN,
                 ...this.getTokensFromRemainingText(lexemes[1]),
-                {
-                    name: 'RIGHT HIGHLIGHTED TEXT MARKUP',
-                    value: '=`',
-                },
+                markup_tokens_1.RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN,
             ];
             this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
         }
@@ -220,15 +183,9 @@ class Lexer {
             [matchedString] = remainingText.match(/^`-.+-`/);
             lexemes = remainingText.match(/^`-.+-`/)[0].split(/(?<=`-)|(?=-`)/g);
             tokens = [
-                {
-                    name: 'LEFT STRIKETHROUGH TEXT MARKUP',
-                    value: '`-',
-                },
+                markup_tokens_1.LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN,
                 ...this.getTokensFromRemainingText(lexemes[1]),
-                {
-                    name: 'RIGHT STRIKETHROUGH TEXT MARKUP',
-                    value: '-`',
-                },
+                markup_tokens_1.RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN,
             ];
             this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
         }
@@ -239,20 +196,11 @@ class Lexer {
             const thirdSplit = firstSplit[2].split(/(?=\)`)/g);
             lexemes = [...secondSplit, '_(', ...thirdSplit];
             tokens = [
-                {
-                    name: 'LINK TEXT MARKUP 1',
-                    value: '`_',
-                },
+                markup_tokens_1.LINK_TEXT_MARKUP_1_TOKEN,
                 ...this.getTokensFromRemainingText(lexemes[1]),
-                {
-                    name: 'LINK TEXT MARKUP 2',
-                    value: '_(',
-                },
+                markup_tokens_1.LINK_TEXT_MARKUP_2_TOKEN,
                 ...this.getTokensFromRemainingText(lexemes[3]),
-                {
-                    name: 'LINK TEXT MARKUP 3',
-                    value: ')`',
-                },
+                markup_tokens_1.LINK_TEXT_MARKUP_3_TOKEN,
             ];
             this.adjustCursor(false, lexemes[0].length + lexemes[2].length + lexemes[4].length);
         }
