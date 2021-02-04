@@ -1,13 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const patterns_1 = require("./patterns");
 const markup_tokens_1 = require("./markup_tokens");
-// const HEADING_1_MARKUP_PATTERN = /=1= /;
-// const HEADING_2_MARKUP_PATTERN = /=2= /;
-// const HEADING_3_MARKUP_PATTERN = /=3= /;
-// const ORDERED_LIST_MARKUP_PATTERN = /\* /;
-// const UNORDERED_LIST_MARKUP_PATTERN = /\d+. /;
-// const HORIZONTAL_RULE_MARKUP_PATTERN = /--- /;
-// const IMAGE_PATTERN = /image:.+{}/;
 class Lexer {
     constructor() {
         this.userInput = '';
@@ -25,7 +19,7 @@ class Lexer {
         // process tabs in blocksandtriggers here
     }
     splitUserInputIntoBlocksAndTriggers(input) {
-        const split = input.split(/(\n\n\t+|\n\n|\n\t+|(?<=\n\t+.*)\n(?!\n|\t)|(?<=\n\n)\n|^\n|\n$)/g); // split any instances of new (indented) block trigger
+        const split = input.split(patterns_1.TRIGGER_PATTERN); // split any instances of new (indented) block trigger
         this.blocksAndTriggers.push(...split);
     }
     removeUnnecessaryTabsFromBlocksAndTriggers() {
@@ -65,9 +59,12 @@ class Lexer {
             return this.getTokenFromBlockTrigger();
         }
         // block markups
-        const blockMarkupMatch = this.blocksAndTriggers[this.cursor[0]].substring(this.cursor[1]).match(/^(=1= |=2= |=3= |\* |\d+. |--- )/);
-        if (blockMarkupMatch) {
-            return this.getTokenFromBlockMarkup(blockMarkupMatch[0]);
+        if (this.cursor[1] === 0) {
+            const blockMarkupPattern = new RegExp(`${patterns_1.HEADING_1_MARKUP_PATTERN.source}|${patterns_1.HEADING_2_MARKUP_PATTERN.source}|${patterns_1.HEADING_3_MARKUP_PATTERN.source}|${patterns_1.UNORDERED_LIST_MARKUP_PATTERN.source}|${patterns_1.ORDERED_LIST_MARKUP_PATTERN.source}|${patterns_1.HORIZONTAL_RULE_MARKUP_PATTERN.source}`);
+            const blockMarkupMatch = this.blocksAndTriggers[this.cursor[0]].match(blockMarkupPattern);
+            if (blockMarkupMatch) {
+                return this.getTokenFromBlockMarkup(blockMarkupMatch[0]);
+            }
         }
         // images/hybrid
         const imageMarkupMatch = this.blocksAndTriggers[this.cursor[0]].substring(this.cursor[1]).match(/^image:.+{}/);

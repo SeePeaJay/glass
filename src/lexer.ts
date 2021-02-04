@@ -1,15 +1,10 @@
 import { Token } from './types';
 import {
+	TRIGGER_PATTERN, HEADING_1_MARKUP_PATTERN, HEADING_2_MARKUP_PATTERN, HEADING_3_MARKUP_PATTERN, UNORDERED_LIST_MARKUP_PATTERN, ORDERED_LIST_MARKUP_PATTERN, HORIZONTAL_RULE_MARKUP_PATTERN,
+} from './patterns';
+import {
 	HEADING_1_MARKUP_TOKEN, HEADING_2_MARKUP_TOKEN, HEADING_3_MARKUP_TOKEN, UNORDERED_LIST_MARKUP_TOKEN, HORIZONTAL_RULE_MARKUP_TOKEN, IMAGE_MARKUP_1_TOKEN, IMAGE_MARKUP_2_TOKEN, LEFT_BOLD_TEXT_MARKUP_TOKEN, RIGHT_BOLD_TEXT_MARKUP_TOKEN, LEFT_ITALIC_TEXT_MARKUP_TOKEN, RIGHT_ITALIC_TEXT_MARKUP_TOKEN, LEFT_UNDERLINED_TEXT_MARKUP_TOKEN, RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN, LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, LINK_TEXT_MARKUP_1_TOKEN, LINK_TEXT_MARKUP_2_TOKEN, LINK_TEXT_MARKUP_3_TOKEN,
 } from './markup_tokens';
-
-// const HEADING_1_MARKUP_PATTERN = /=1= /;
-// const HEADING_2_MARKUP_PATTERN = /=2= /;
-// const HEADING_3_MARKUP_PATTERN = /=3= /;
-// const ORDERED_LIST_MARKUP_PATTERN = /\* /;
-// const UNORDERED_LIST_MARKUP_PATTERN = /\d+. /;
-// const HORIZONTAL_RULE_MARKUP_PATTERN = /--- /;
-// const IMAGE_PATTERN = /image:.+{}/;
 
 class Lexer {
 	userInput: string;
@@ -36,7 +31,7 @@ class Lexer {
     }
 
     splitUserInputIntoBlocksAndTriggers(input: string) {
-		const split = input.split(/(\n\n\t+|\n\n|\n\t+|(?<=\n\t+.*)\n(?!\n|\t)|(?<=\n\n)\n|^\n|\n$)/g); // split any instances of new (indented) block trigger
+		const split = input.split(TRIGGER_PATTERN); // split any instances of new (indented) block trigger
 		this.blocksAndTriggers.push(...split);
 	}
 
@@ -83,9 +78,14 @@ class Lexer {
 		}
 
 		// block markups
-		const blockMarkupMatch = this.blocksAndTriggers[this.cursor[0]].substring(this.cursor[1]).match(/^(=1= |=2= |=3= |\* |\d+. |--- )/);
-		if (blockMarkupMatch) {
-			return this.getTokenFromBlockMarkup(blockMarkupMatch[0]);
+		if (this.cursor[1] === 0) {
+			const blockMarkupPattern = new RegExp(
+				`${HEADING_1_MARKUP_PATTERN.source}|${HEADING_2_MARKUP_PATTERN.source}|${HEADING_3_MARKUP_PATTERN.source}|${UNORDERED_LIST_MARKUP_PATTERN.source}|${ORDERED_LIST_MARKUP_PATTERN.source}|${HORIZONTAL_RULE_MARKUP_PATTERN.source}`,
+			);
+			const blockMarkupMatch = this.blocksAndTriggers[this.cursor[0]].match(blockMarkupPattern);
+			if (blockMarkupMatch) {
+				return this.getTokenFromBlockMarkup(blockMarkupMatch[0]);
+			}
 		}
 
 		// images/hybrid
