@@ -1,9 +1,9 @@
 import { Token } from './types';
 import {
-	TRIGGER_PATTERN, HEADING_1_MARKUP_PATTERN, HEADING_2_MARKUP_PATTERN, HEADING_3_MARKUP_PATTERN, UNORDERED_LIST_MARKUP_PATTERN, ORDERED_LIST_MARKUP_PATTERN, HORIZONTAL_RULE_MARKUP_PATTERN,
+	TRIGGER_PATTERN, HEADING_1_MARKUP_PATTERN, HEADING_2_MARKUP_PATTERN, HEADING_3_MARKUP_PATTERN, UNORDERED_LIST_MARKUP_PATTERN, ORDERED_LIST_MARKUP_PATTERN, HORIZONTAL_RULE_MARKUP_PATTERN, IMAGE_PATTERN, BOLD_TEXT_PATTERN, ITALIC_TEXT_PATTERN, UNDERLINED_TEXT_PATTERN, HIGHLIGHTED_TEXT_PATTERN, STRIKETHROUGH_TEXT_PATTERN, LINK_PATTERN,
 } from './patterns';
 import {
-	HEADING_1_MARKUP_TOKEN, HEADING_2_MARKUP_TOKEN, HEADING_3_MARKUP_TOKEN, UNORDERED_LIST_MARKUP_TOKEN, HORIZONTAL_RULE_MARKUP_TOKEN, IMAGE_MARKUP_1_TOKEN, IMAGE_MARKUP_2_TOKEN, LEFT_BOLD_TEXT_MARKUP_TOKEN, RIGHT_BOLD_TEXT_MARKUP_TOKEN, LEFT_ITALIC_TEXT_MARKUP_TOKEN, RIGHT_ITALIC_TEXT_MARKUP_TOKEN, LEFT_UNDERLINED_TEXT_MARKUP_TOKEN, RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN, LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, LINK_TEXT_MARKUP_1_TOKEN, LINK_TEXT_MARKUP_2_TOKEN, LINK_TEXT_MARKUP_3_TOKEN,
+	HEADING_1_MARKUP_TOKEN, HEADING_2_MARKUP_TOKEN, HEADING_3_MARKUP_TOKEN, UNORDERED_LIST_MARKUP_TOKEN, HORIZONTAL_RULE_MARKUP_TOKEN, IMAGE_MARKUP_1_TOKEN, IMAGE_MARKUP_2_TOKEN, LEFT_BOLD_TEXT_MARKUP_TOKEN, RIGHT_BOLD_TEXT_MARKUP_TOKEN, // LEFT_ITALIC_TEXT_MARKUP_TOKEN, RIGHT_ITALIC_TEXT_MARKUP_TOKEN, LEFT_UNDERLINED_TEXT_MARKUP_TOKEN, RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN, LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, LINK_TEXT_MARKUP_1_TOKEN, LINK_TEXT_MARKUP_2_TOKEN, LINK_TEXT_MARKUP_3_TOKEN,
 } from './markup_tokens';
 
 class Lexer {
@@ -79,17 +79,17 @@ class Lexer {
 
 		// block markups
 		if (this.cursor[1] === 0) {
-			const blockMarkupPattern = new RegExp(
+			const blockMarkupsPattern = new RegExp(
 				`${HEADING_1_MARKUP_PATTERN.source}|${HEADING_2_MARKUP_PATTERN.source}|${HEADING_3_MARKUP_PATTERN.source}|${UNORDERED_LIST_MARKUP_PATTERN.source}|${ORDERED_LIST_MARKUP_PATTERN.source}|${HORIZONTAL_RULE_MARKUP_PATTERN.source}`,
 			);
-			const blockMarkupMatch = this.blocksAndTriggers[this.cursor[0]].match(blockMarkupPattern);
+			const blockMarkupMatch = this.blocksAndTriggers[this.cursor[0]].match(blockMarkupsPattern);
 			if (blockMarkupMatch) {
 				return this.getTokenFromBlockMarkup(blockMarkupMatch[0]);
 			}
 		}
 
 		// images/hybrid
-		const imageMarkupMatch = this.blocksAndTriggers[this.cursor[0]].substring(this.cursor[1]).match(/^image:.+{}/);
+		const imageMarkupMatch = this.blocksAndTriggers[this.cursor[0]].substring(this.cursor[1]).match(IMAGE_PATTERN);
 		if (imageMarkupMatch) {
 			return this.getTokenFromImageMarkup(imageMarkupMatch[0]);
 		}
@@ -160,85 +160,163 @@ class Lexer {
 
     getTokensFromRemainingText(remainingText: string): Token[] {
 		let lexemes;
-		let tokens;
-		let matchedString = '';
+		let tokens: Token[] = [];
+		// let matchedString = '';
 
-		if (remainingText.match(/^`@.+@`/)) {
-			[matchedString] = remainingText.match(/^`@.+@`/)!;
-			lexemes = matchedString.split(/(?<=`@)|(?=@`)/g);
-			tokens = [
-				LEFT_BOLD_TEXT_MARKUP_TOKEN,
-				...this.getTokensFromRemainingText(lexemes[1]),
-				RIGHT_BOLD_TEXT_MARKUP_TOKEN,
-			];
-			this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
-		} else if (remainingText.match(/^`\/.+\/`/)) {
-			[matchedString] = remainingText.match(/^`\/.+\/`/)!;
-			lexemes = remainingText.match(/^`\/.+\/`/)![0].split(/(?<=`\/)|(?=\/`)/g);
-			tokens = [
-				LEFT_ITALIC_TEXT_MARKUP_TOKEN,
-				...this.getTokensFromRemainingText(lexemes[1]),
-				RIGHT_ITALIC_TEXT_MARKUP_TOKEN,
-			];
-			this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
-		} else if (remainingText.match(/^`_.+_`/)) {
-			[matchedString] = remainingText.match(/^`_.+_`/)!;
-			lexemes = remainingText.match(/^`_.+_`/)![0].split(/(?<=`_)|(?=_`)/g);
-			tokens = [
-				LEFT_UNDERLINED_TEXT_MARKUP_TOKEN,
-				...this.getTokensFromRemainingText(lexemes[1]),
-				RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN,
-			];
-			this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
-		} else if (remainingText.match(/^`=.+=`/)) {
-			[matchedString] = remainingText.match(/^`=.+=`/)!;
-			lexemes = remainingText.match(/^`=.+=`/)![0].split(/(?<=`=)|(?==`)/g);
-			tokens = [
-				LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN,
-				...this.getTokensFromRemainingText(lexemes[1]),
-				RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN,
-			];
-			this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
-		} else if (remainingText.match(/^`-.+-`/)) {
-			[matchedString] = remainingText.match(/^`-.+-`/)!;
-			lexemes = remainingText.match(/^`-.+-`/)![0].split(/(?<=`-)|(?=-`)/g);
-			tokens = [
-				LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN,
-				...this.getTokensFromRemainingText(lexemes[1]),
-				RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN,
-			];
-			this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
-		} else if (remainingText.match(/^`_.+_\(.+\)`/)) {
-			[matchedString] = remainingText.match(/^`_.+_\(.+\)`/)!;
-			const firstSplit = matchedString.split(/_(\()/g);
-			const secondSplit = firstSplit[0].split(/(?<=`_)/g);
-			const thirdSplit = firstSplit[2].split(/(?=\)`)/g);
-			lexemes = [...secondSplit, '_(', ...thirdSplit];
-			tokens = [
-				LINK_TEXT_MARKUP_1_TOKEN,
-				...this.getTokensFromRemainingText(lexemes[1]),
-				LINK_TEXT_MARKUP_2_TOKEN,
-				...this.getTokensFromRemainingText(lexemes[3]),
-				LINK_TEXT_MARKUP_3_TOKEN,
-			];
-			this.adjustCursor(false, lexemes[0].length + lexemes[2].length + lexemes[4].length);
-		} else if (remainingText.length === 1) {
-			tokens = [
-				{
-					name: 'NON-CONTROL CHARACTER',
-					value: remainingText,
-				},
-			];
+		const inlinePattern = new RegExp(
+				`${BOLD_TEXT_PATTERN.source}|${ITALIC_TEXT_PATTERN.source}|${UNDERLINED_TEXT_PATTERN.source}|${HIGHLIGHTED_TEXT_PATTERN.source}|${STRIKETHROUGH_TEXT_PATTERN.source}|${LINK_PATTERN.source}`, // and image?
+		);
+
+		const inlineMatch = remainingText.match(inlinePattern);
+
+		if (!inlineMatch) {
+			if (remainingText.length === 1) {
+				tokens = [
+					{
+						name: 'NON-CONTROL CHARACTER',
+						value: remainingText,
+					},
+				];
+			} else {
+				tokens = [
+					{
+						name: 'NON-CONTROL CHARACTERS',
+						value: remainingText,
+					},
+				];
+			}
 			this.adjustCursor(false, remainingText.length);
 		} else {
-			tokens = [
-				{
-					name: 'NON-CONTROL CHARACTERS',
-					value: remainingText,
-				},
-			];
-			this.adjustCursor(false, remainingText.length);
+			const inline = inlineMatch[0];
+			const nonControls = remainingText.split(inline);
+
+			if (nonControls[0].length) {
+				if (nonControls[0].length === 1) {
+					tokens.push(
+						{
+							name: 'NON-CONTROL CHARACTER',
+							value: nonControls[0],
+						},
+					);
+				} else {
+					tokens.push(
+						{
+							name: 'NON-CONTROL CHARACTERS',
+							value: nonControls[0],
+						},
+					);
+				}
+				this.adjustCursor(false, nonControls[0].length);
+			}
+
+			// const inline = texts[1];
+
+			if (inline.startsWith(LEFT_BOLD_TEXT_MARKUP_TOKEN.value)) {
+				lexemes = inline.split(/(?<=`@)|(?=@`)/g);
+				tokens.push(
+					LEFT_BOLD_TEXT_MARKUP_TOKEN,
+					...this.getTokensFromRemainingText(lexemes[1]),
+					RIGHT_BOLD_TEXT_MARKUP_TOKEN,
+				);
+				this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
+			}
+
+			if (nonControls[1].length) {
+				if (nonControls[1].length === 1) {
+					tokens.push(
+						{
+							name: 'NON-CONTROL CHARACTER',
+							value: nonControls[1],
+						},
+					);
+				} else {
+					tokens.push(
+						{
+							name: 'NON-CONTROL CHARACTERS',
+							value: nonControls[1],
+						},
+					);
+				}
+				this.adjustCursor(false, nonControls[1].length);
+			}
 		}
+
+		// if (remainingText.match(/^`@.+@`/)) {
+		// 	[matchedString] = remainingText.match(/^`@.+@`/)!;
+		// 	lexemes = matchedString.split(/(?<=`@)|(?=@`)/g);
+		// 	tokens = [
+		// 		LEFT_BOLD_TEXT_MARKUP_TOKEN,
+		// 		...this.getTokensFromRemainingText(lexemes[1]),
+		// 		RIGHT_BOLD_TEXT_MARKUP_TOKEN,
+		// 	];
+		// 	this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
+		// } else if (remainingText.match(/^`\/.+\/`/)) {
+		// 	[matchedString] = remainingText.match(/^`\/.+\/`/)!;
+		// 	lexemes = remainingText.match(/^`\/.+\/`/)![0].split(/(?<=`\/)|(?=\/`)/g);
+		// 	tokens = [
+		// 		LEFT_ITALIC_TEXT_MARKUP_TOKEN,
+		// 		...this.getTokensFromRemainingText(lexemes[1]),
+		// 		RIGHT_ITALIC_TEXT_MARKUP_TOKEN,
+		// 	];
+		// 	this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
+		// } else if (remainingText.match(/^`_.+_`/)) {
+		// 	[matchedString] = remainingText.match(/^`_.+_`/)!;
+		// 	lexemes = remainingText.match(/^`_.+_`/)![0].split(/(?<=`_)|(?=_`)/g);
+		// 	tokens = [
+		// 		LEFT_UNDERLINED_TEXT_MARKUP_TOKEN,
+		// 		...this.getTokensFromRemainingText(lexemes[1]),
+		// 		RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN,
+		// 	];
+		// 	this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
+		// } else if (remainingText.match(/^`=.+=`/)) {
+		// 	[matchedString] = remainingText.match(/^`=.+=`/)!;
+		// 	lexemes = remainingText.match(/^`=.+=`/)![0].split(/(?<=`=)|(?==`)/g);
+		// 	tokens = [
+		// 		LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN,
+		// 		...this.getTokensFromRemainingText(lexemes[1]),
+		// 		RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN,
+		// 	];
+		// 	this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
+		// } else if (remainingText.match(/^`-.+-`/)) {
+		// 	[matchedString] = remainingText.match(/^`-.+-`/)!;
+		// 	lexemes = remainingText.match(/^`-.+-`/)![0].split(/(?<=`-)|(?=-`)/g);
+		// 	tokens = [
+		// 		LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN,
+		// 		...this.getTokensFromRemainingText(lexemes[1]),
+		// 		RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN,
+		// 	];
+		// 	this.adjustCursor(false, lexemes[0].length + lexemes[2].length);
+		// } else if (remainingText.match(/^`_.+_\(.+\)`/)) {
+		// 	[matchedString] = remainingText.match(/^`_.+_\(.+\)`/)!;
+		// 	const firstSplit = matchedString.split(/_(\()/g);
+		// 	const secondSplit = firstSplit[0].split(/(?<=`_)/g);
+		// 	const thirdSplit = firstSplit[2].split(/(?=\)`)/g);
+		// 	lexemes = [...secondSplit, '_(', ...thirdSplit];
+		// 	tokens = [
+		// 		LINK_TEXT_MARKUP_1_TOKEN,
+		// 		...this.getTokensFromRemainingText(lexemes[1]),
+		// 		LINK_TEXT_MARKUP_2_TOKEN,
+		// 		...this.getTokensFromRemainingText(lexemes[3]),
+		// 		LINK_TEXT_MARKUP_3_TOKEN,
+		// 	];
+		// 	this.adjustCursor(false, lexemes[0].length + lexemes[2].length + lexemes[4].length);
+		// } else if (remainingText.length === 1) {
+		// 	tokens = [
+		// 		{
+		// 			name: 'NON-CONTROL CHARACTER',
+		// 			value: remainingText,
+		// 		},
+		// 	];
+		// 	this.adjustCursor(false, remainingText.length);
+		// } else {
+		// 	tokens = [
+		// 		{
+		// 			name: 'NON-CONTROL CHARACTERS',
+		// 			value: remainingText,
+		// 		},
+		// 	];
+		// 	this.adjustCursor(false, remainingText.length);
+		// }
 
 		return tokens;
 	}

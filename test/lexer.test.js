@@ -501,6 +501,39 @@ describe('tests on correct production of token(s)', () => {
         ];
         expect(receivedTokens).toStrictEqual(expectedTokens);
     });
+    test('a single bold text within a paragraph', () => {
+        const input = 'This is a standard paragraph with a single `@bold@` text.';
+        const receivedTokens = [];
+        lexer.processUserInput(input);
+        let token = lexer.getNextToken();
+        while (token) {
+            receivedTokens.push(token);
+            token = lexer.getNextToken();
+        }
+        const expectedTokens = [
+            {
+                name: 'NON-CONTROL CHARACTERS',
+                value: 'This is a standard paragraph with a single ',
+            },
+            {
+                name: 'LEFT BOLD TEXT MARKUP',
+                value: '`@',
+            },
+            {
+                name: 'NON-CONTROL CHARACTERS',
+                value: 'bold',
+            },
+            {
+                name: 'RIGHT BOLD TEXT MARKUP',
+                value: '@`',
+            },
+            {
+                name: 'NON-CONTROL CHARACTERS',
+                value: ' text.',
+            },
+        ];
+        expect(receivedTokens).toStrictEqual(expectedTokens);
+    });
     // test('nested styles', () => {
     // 	const input = '`@Styles can be `/nested/`.@`';
     // 	const receivedTokens: Token[] = [];
