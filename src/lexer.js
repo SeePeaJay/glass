@@ -66,14 +66,6 @@ class Lexer {
                 return this.getTokenFromBlockMarkup(blockMarkupMatch[0]);
             }
         }
-        // // images/hybrid
-        // const imageMarkupMatch = this.blocksAndTriggers[this.cursor[0]].substring(this.cursor[1]).match(IMAGE_MARKUP_PATTERN);
-        // if (imageMarkupMatch) {
-        // 	const imageTokens = this.getTokensFromImageMarkup(imageMarkupMatch[0]);
-        // 	const token = imageTokens.shift()!;
-        // 	this.tokenQueue.push(...imageTokens);
-        // 	return token;
-        // }
         // remaining text
         const remainingText = this.blocksAndTriggers[this.cursor[0]].substring(this.cursor[1]);
         const remainingTokensInCurrentBlock = this.getTokensFromRemainingText(remainingText);
@@ -132,7 +124,8 @@ class Lexer {
         return token;
     }
     getTokensFromImageMarkup(imageMarkup) {
-        const imageChunks = imageMarkup.split(/(?<=image:)|(?={})/);
+        const splitImageMarkupPattern = new RegExp(`(?<=${markup_tokens_1.IMAGE_MARKUP_1_TOKEN.value})|(?=${markup_tokens_1.IMAGE_MARKUP_2_TOKEN.value})`);
+        const imageChunks = imageMarkup.split(splitImageMarkupPattern);
         const tokens = [
             markup_tokens_1.IMAGE_MARKUP_1_TOKEN,
             ...this.getTokensFromRemainingText(imageChunks[1]),
@@ -143,7 +136,7 @@ class Lexer {
     }
     getTokensFromRemainingText(remainingText) {
         let tokens = [];
-        const inlinePattern = new RegExp(`${patterns_1.BOLD_TEXT_PATTERN.source}|${patterns_1.ITALIC_TEXT_PATTERN.source}|${patterns_1.UNDERLINED_TEXT_PATTERN.source}|${patterns_1.HIGHLIGHTED_TEXT_PATTERN.source}|${patterns_1.STRIKETHROUGH_TEXT_PATTERN.source}|${patterns_1.LINK_PATTERN.source}`);
+        const inlinePattern = new RegExp(`${patterns_1.IMAGE_MARKUP_PATTERN.source}|${patterns_1.BOLD_TEXT_PATTERN.source}|${patterns_1.ITALIC_TEXT_PATTERN.source}|${patterns_1.UNDERLINED_TEXT_PATTERN.source}|${patterns_1.HIGHLIGHTED_TEXT_PATTERN.source}|${patterns_1.STRIKETHROUGH_TEXT_PATTERN.source}|${patterns_1.LINK_PATTERN.source}`);
         const inlineMatch = remainingText.match(inlinePattern);
         if (!inlineMatch) {
             if (remainingText.length === 1) {
@@ -236,19 +229,7 @@ class Lexer {
                 this.adjustCursor(false, linkChunks[0].length + linkChunks[2].length + linkChunks[4].length);
             }
             if (nonControls[1].length) {
-                if (nonControls[1].length === 1) {
-                    tokens.push({
-                        name: 'NON-CONTROL CHARACTER',
-                        value: nonControls[1],
-                    });
-                }
-                else {
-                    tokens.push({
-                        name: 'NON-CONTROL CHARACTERS',
-                        value: nonControls[1],
-                    });
-                }
-                this.adjustCursor(false, nonControls[1].length);
+                tokens.push(...this.getTokensFromRemainingText(nonControls[1]));
             }
         }
         return tokens;

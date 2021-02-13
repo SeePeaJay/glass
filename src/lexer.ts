@@ -147,7 +147,8 @@ class Lexer {
 	}
 
 	getTokensFromImageMarkup(imageMarkup: string) {
-		const imageChunks = imageMarkup.split(/(?<=image:)|(?={})/);
+		const splitImageMarkupPattern = new RegExp(`(?<=${IMAGE_MARKUP_1_TOKEN.value})|(?=${IMAGE_MARKUP_2_TOKEN.value})`);
+		const imageChunks = imageMarkup.split(splitImageMarkupPattern);
 		const tokens = [
 			IMAGE_MARKUP_1_TOKEN,
 			...this.getTokensFromRemainingText(imageChunks[1]),
@@ -185,25 +186,25 @@ class Lexer {
 			this.adjustCursor(false, remainingText.length);
 		} else {
 			const inline = inlineMatch[0];
-			const nonControls = remainingText.split(inline);
+			const unmatchedTexts = remainingText.split(inline);
 
-			if (nonControls[0].length) {
-				if (nonControls[0].length === 1) {
+			if (unmatchedTexts[0].length) {
+				if (unmatchedTexts[0].length === 1) {
 					tokens.push(
 						{
 							name: 'NON-CONTROL CHARACTER',
-							value: nonControls[0],
+							value: unmatchedTexts[0],
 						},
 					);
 				} else {
 					tokens.push(
 						{
 							name: 'NON-CONTROL CHARACTERS',
-							value: nonControls[0],
+							value: unmatchedTexts[0],
 						},
 					);
 				}
-				this.adjustCursor(false, nonControls[0].length);
+				this.adjustCursor(false, unmatchedTexts[0].length);
 			}
 
 			if (inline.startsWith(IMAGE_MARKUP_1_TOKEN.value)) {
@@ -274,23 +275,8 @@ class Lexer {
 				this.adjustCursor(false, linkChunks[0].length + linkChunks[2].length + linkChunks[4].length);
 			}
 
-			if (nonControls[1].length) {
-				if (nonControls[1].length === 1) {
-					tokens.push(
-						{
-							name: 'NON-CONTROL CHARACTER',
-							value: nonControls[1],
-						},
-					);
-				} else {
-					tokens.push(
-						{
-							name: 'NON-CONTROL CHARACTERS',
-							value: nonControls[1],
-						},
-					);
-				}
-				this.adjustCursor(false, nonControls[1].length);
+			if (unmatchedTexts[1].length) {
+				tokens.push(...this.getTokensFromRemainingText(unmatchedTexts[1]));
 			}
 		}
 

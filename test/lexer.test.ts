@@ -197,27 +197,27 @@ describe('tests on correct production of token(s)', () => {
 		expect(receivedTokens).toStrictEqual(expectedTokens);
 	});
 
-	// test('a single heading 3 block', () => {
-	// 	const input = '`@bold@``/italic/`=3= Heading 3';
-	// 	const receivedTokens: Token[] = [];
-	// 	lexer.processUserInput(input);
-	// 	let token = lexer.getNextToken();
-	// 	while (token) {
-	// 		receivedTokens.push(token!);
-	// 		token = lexer.getNextToken();
-	// 	}
-	// 	const expectedTokens: Token[] = [
-	// 		{
-	// 			name: 'HEADING 3 MARKUP',
-	// 			value: '=3= ',
-	// 		},
-	// 		{
-	// 			name: 'NON-CONTROL CHARACTERS',
-	// 			value: 'Heading 3',
-	// 		},
-	// 	];
-	// 	expect(receivedTokens).toStrictEqual(expectedTokens);
-	// });
+	test('a single heading 3 block', () => {
+		const input = '=3= Heading 3';
+		const receivedTokens: Token[] = [];
+		lexer.processUserInput(input);
+		let token = lexer.getNextToken();
+		while (token) {
+			receivedTokens.push(token!);
+			token = lexer.getNextToken();
+		}
+		const expectedTokens: Token[] = [
+			{
+				name: 'HEADING 3 MARKUP',
+				value: '=3= ',
+			},
+			{
+				name: 'NON-CONTROL CHARACTERS',
+				value: 'Heading 3',
+			},
+		];
+		expect(receivedTokens).toStrictEqual(expectedTokens);
+	});
 
 	test('a single unordered list block', () => {
 		const input = '* list';
@@ -602,6 +602,48 @@ describe('tests on correct production of token(s)', () => {
 			{
 				name: 'RIGHT BOLD TEXT MARKUP',
 				value: '@`',
+			},
+		];
+		expect(receivedTokens).toStrictEqual(expectedTokens);
+	});
+
+	test('conjoined styles', () => {
+		const input = '`@bold@` and `/italic/`';
+		const receivedTokens: Token[] = [];
+		lexer.processUserInput(input);
+		let token = lexer.getNextToken();
+		while (token) {
+			receivedTokens.push(token!);
+			token = lexer.getNextToken();
+		}
+		const expectedTokens: Token[] = [
+			{
+				name: 'LEFT BOLD TEXT MARKUP',
+				value: '`@',
+			},
+			{
+				name: 'NON-CONTROL CHARACTERS',
+				value: 'bold',
+			},
+			{
+				name: 'RIGHT BOLD TEXT MARKUP',
+				value: '@`',
+			},
+			{
+				name: 'NON-CONTROL CHARACTERS',
+				value: ' and ',
+			},
+			{
+				name: 'LEFT ITALIC TEXT MARKUP',
+				value: '`/',
+			},
+			{
+				name: 'NON-CONTROL CHARACTERS',
+				value: 'italic',
+			},
+			{
+				name: 'RIGHT ITALIC TEXT MARKUP',
+				value: '/`',
 			},
 		];
 		expect(receivedTokens).toStrictEqual(expectedTokens);
