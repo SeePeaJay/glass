@@ -534,45 +534,45 @@ describe('tests on correct production of token(s)', () => {
         ];
         expect(receivedTokens).toStrictEqual(expectedTokens);
     });
-    // test('nested styles', () => {
-    // 	const input = '`@Styles can be `/nested/`.@`';
-    // 	const receivedTokens: Token[] = [];
-    // 	lexer.processUserInput(input);
-    // 	let token = lexer.getNextToken();
-    // 	while (token) {
-    // 		receivedTokens.push(token!);
-    // 		token = lexer.getNextToken();
-    // 	}
-    // 	const expectedTokens: Token[] = [
-    // 		{
-    // 			name: 'LEFT BOLD TEXT MARKUP',
-    // 			value: '`@',
-    // 		},
-    // 		{
-    // 			name: 'NON-CONTROL CHARACTERS',
-    // 			value: 'Styles can be ',
-    // 		},
-    // 		{
-    // 			name: 'LEFT ITALIC TEXT MARKUP',
-    // 			value: '`/',
-    // 		},
-    // 		{
-    // 			name: 'NON-CONTROL CHARACTERS',
-    // 			value: 'nested',
-    // 		},
-    // 		{
-    // 			name: 'RIGHT ITALIC TEXT MARKUP',
-    // 			value: '/`',
-    // 		},
-    // 		{
-    // 			name: 'NON-CONTROL CHARACTER',
-    // 			value: '.',
-    // 		},
-    // 		{
-    // 			name: 'RIGHT BOLD TEXT MARKUP',
-    // 			value: '@`',
-    // 		},
-    // 	];
-    // 	expect(receivedTokens).toStrictEqual(expectedTokens);
-    // });
+    test('nested styles', () => {
+        const input = '`@Styles can be `/nested/`.@`';
+        const receivedTokens = [];
+        lexer.processUserInput(input);
+        let token = lexer.getNextToken();
+        while (token) {
+            receivedTokens.push(token);
+            token = lexer.getNextToken();
+        }
+        const expectedTokens = [
+            {
+                name: 'LEFT BOLD TEXT MARKUP',
+                value: '`@',
+            },
+            {
+                name: 'NON-CONTROL CHARACTERS',
+                value: 'Styles can be ',
+            },
+            {
+                name: 'LEFT ITALIC TEXT MARKUP',
+                value: '`/',
+            },
+            {
+                name: 'NON-CONTROL CHARACTERS',
+                value: 'nested',
+            },
+            {
+                name: 'RIGHT ITALIC TEXT MARKUP',
+                value: '/`',
+            },
+            {
+                name: 'NON-CONTROL CHARACTER',
+                value: '.',
+            },
+            {
+                name: 'RIGHT BOLD TEXT MARKUP',
+                value: '@`',
+            },
+        ];
+        expect(receivedTokens).toStrictEqual(expectedTokens);
+    });
 });
