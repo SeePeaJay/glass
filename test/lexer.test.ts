@@ -117,25 +117,7 @@ describe('tests on correct production of token(s)', () => {
 		expect(receivedTokens).toStrictEqual(expectedTokens);
 	});
 
-	test('a single paragraph block (a single character)', () => {
-		const input = 'T';
-		const receivedTokens: Token[] = [];
-		lexer.processUserInput(input);
-		let token = lexer.getNextToken();
-		while (token) {
-			receivedTokens.push(token!);
-			token = lexer.getNextToken();
-		}
-		const expectedTokens: Token[] = [
-			{
-				name: 'NON-CONTROL CHARACTER',
-				value: 'T',
-			},
-		];
-		expect(receivedTokens).toStrictEqual(expectedTokens);
-	});
-
-	test('a single paragraph block (multiple characters)', () => {
+	test('a single paragraph block', () => {
 		const input = 'This is a paragraph.';
 		const receivedTokens: Token[] = [];
 		lexer.processUserInput(input);
@@ -596,7 +578,7 @@ describe('tests on correct production of token(s)', () => {
 				value: '/`',
 			},
 			{
-				name: 'NON-CONTROL CHARACTER',
+				name: 'NON-CONTROL CHARACTERS',
 				value: '.',
 			},
 			{

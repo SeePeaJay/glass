@@ -168,42 +168,24 @@ class Lexer {
 		const inlineMatch = remainingText.match(inlinePattern);
 
 		if (!inlineMatch) {
-			if (remainingText.length === 1) {
-				tokens = [
-					{
-						name: 'NON-CONTROL CHARACTER',
-						value: remainingText,
-					},
-				];
-			} else {
-				tokens = [
-					{
-						name: 'NON-CONTROL CHARACTERS',
-						value: remainingText,
-					},
-				];
-			}
+			tokens = [
+				{
+					name: 'NON-CONTROL CHARACTERS',
+					value: remainingText,
+				},
+			];
 			this.adjustCursor(false, remainingText.length);
 		} else {
 			const inline = inlineMatch[0];
 			const unmatchedTexts = remainingText.split(inline);
 
 			if (unmatchedTexts[0].length) {
-				if (unmatchedTexts[0].length === 1) {
-					tokens.push(
-						{
-							name: 'NON-CONTROL CHARACTER',
-							value: unmatchedTexts[0],
-						},
-					);
-				} else {
-					tokens.push(
-						{
-							name: 'NON-CONTROL CHARACTERS',
-							value: unmatchedTexts[0],
-						},
-					);
-				}
+				tokens.push(
+					{
+						name: 'NON-CONTROL CHARACTERS',
+						value: unmatchedTexts[0],
+					},
+				);
 				this.adjustCursor(false, unmatchedTexts[0].length);
 			}
 

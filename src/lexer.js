@@ -139,41 +139,23 @@ class Lexer {
         const inlinePattern = new RegExp(`${patterns_1.IMAGE_MARKUP_PATTERN.source}|${patterns_1.BOLD_TEXT_PATTERN.source}|${patterns_1.ITALIC_TEXT_PATTERN.source}|${patterns_1.UNDERLINED_TEXT_PATTERN.source}|${patterns_1.HIGHLIGHTED_TEXT_PATTERN.source}|${patterns_1.STRIKETHROUGH_TEXT_PATTERN.source}|${patterns_1.LINK_PATTERN.source}`);
         const inlineMatch = remainingText.match(inlinePattern);
         if (!inlineMatch) {
-            if (remainingText.length === 1) {
-                tokens = [
-                    {
-                        name: 'NON-CONTROL CHARACTER',
-                        value: remainingText,
-                    },
-                ];
-            }
-            else {
-                tokens = [
-                    {
-                        name: 'NON-CONTROL CHARACTERS',
-                        value: remainingText,
-                    },
-                ];
-            }
+            tokens = [
+                {
+                    name: 'NON-CONTROL CHARACTERS',
+                    value: remainingText,
+                },
+            ];
             this.adjustCursor(false, remainingText.length);
         }
         else {
             const inline = inlineMatch[0];
-            const nonControls = remainingText.split(inline);
-            if (nonControls[0].length) {
-                if (nonControls[0].length === 1) {
-                    tokens.push({
-                        name: 'NON-CONTROL CHARACTER',
-                        value: nonControls[0],
-                    });
-                }
-                else {
-                    tokens.push({
-                        name: 'NON-CONTROL CHARACTERS',
-                        value: nonControls[0],
-                    });
-                }
-                this.adjustCursor(false, nonControls[0].length);
+            const unmatchedTexts = remainingText.split(inline);
+            if (unmatchedTexts[0].length) {
+                tokens.push({
+                    name: 'NON-CONTROL CHARACTERS',
+                    value: unmatchedTexts[0],
+                });
+                this.adjustCursor(false, unmatchedTexts[0].length);
             }
             if (inline.startsWith(markup_tokens_1.IMAGE_MARKUP_1_TOKEN.value)) {
                 tokens.push(...this.getTokensFromImageMarkup(inline));
@@ -228,8 +210,8 @@ class Lexer {
                 ];
                 this.adjustCursor(false, linkChunks[0].length + linkChunks[2].length + linkChunks[4].length);
             }
-            if (nonControls[1].length) {
-                tokens.push(...this.getTokensFromRemainingText(nonControls[1]));
+            if (unmatchedTexts[1].length) {
+                tokens.push(...this.getTokensFromRemainingText(unmatchedTexts[1]));
             }
         }
         return tokens;
