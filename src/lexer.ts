@@ -147,11 +147,9 @@ class Lexer {
 	}
 
 	getTokensFromImageMarkup(imageMarkup: string) {
-		const splitImageMarkupPattern = new RegExp(`(?<=${IMAGE_MARKUP_1_TOKEN.value})|(?=${IMAGE_MARKUP_2_TOKEN.value})`);
-		const imageChunks = imageMarkup.split(splitImageMarkupPattern);
 		const tokens = [
 			IMAGE_MARKUP_1_TOKEN,
-			...this.getTokensFromRemainingText(imageChunks[1]),
+			...this.getTokensFromRemainingText(imageMarkup.substring(IMAGE_MARKUP_1_TOKEN.value.length, imageMarkup.length - IMAGE_MARKUP_2_TOKEN.value.length)),
 			IMAGE_MARKUP_2_TOKEN,
 		];
 		this.adjustCursor(false, IMAGE_MARKUP_1_TOKEN.value.length + IMAGE_MARKUP_2_TOKEN.value.length);
@@ -192,61 +190,45 @@ class Lexer {
 			if (inline.startsWith(IMAGE_MARKUP_1_TOKEN.value)) {
 				tokens.push(...this.getTokensFromImageMarkup(inline));
 			} else if (inline.startsWith(LEFT_BOLD_TEXT_MARKUP_TOKEN.value)) {
-				const splitBoldTextPattern = new RegExp(`(?<=${LEFT_BOLD_TEXT_MARKUP_TOKEN.value})|(?=${RIGHT_BOLD_TEXT_MARKUP_TOKEN.value})`);
-				const boldTextChunks = inline.split(splitBoldTextPattern);
 				tokens.push(
 					LEFT_BOLD_TEXT_MARKUP_TOKEN,
-					...this.getTokensFromRemainingText(boldTextChunks[1]),
+					...this.getTokensFromRemainingText(inline.substring(LEFT_BOLD_TEXT_MARKUP_TOKEN.value.length, inline.length - RIGHT_BOLD_TEXT_MARKUP_TOKEN.value.length)),
 					RIGHT_BOLD_TEXT_MARKUP_TOKEN,
 				);
-				this.adjustCursor(false, boldTextChunks[0].length + boldTextChunks[2].length);
+				this.adjustCursor(false, LEFT_BOLD_TEXT_MARKUP_TOKEN.value.length + RIGHT_BOLD_TEXT_MARKUP_TOKEN.value.length);
 			} else if (inline.startsWith(LEFT_ITALIC_TEXT_MARKUP_TOKEN.value)) {
-				const splitItalicTextPattern = new RegExp(`(?<=${LEFT_ITALIC_TEXT_MARKUP_TOKEN.value})|(?=${RIGHT_ITALIC_TEXT_MARKUP_TOKEN.value})`);
-				const italicTextChunks = inline.split(splitItalicTextPattern);
 				tokens.push(
 					LEFT_ITALIC_TEXT_MARKUP_TOKEN,
-					...this.getTokensFromRemainingText(italicTextChunks[1]),
+					...this.getTokensFromRemainingText(inline.substring(LEFT_ITALIC_TEXT_MARKUP_TOKEN.value.length, inline.length - RIGHT_ITALIC_TEXT_MARKUP_TOKEN.value.length)),
 					RIGHT_ITALIC_TEXT_MARKUP_TOKEN,
 				);
-				this.adjustCursor(false, italicTextChunks[0].length + italicTextChunks[2].length);
+				this.adjustCursor(false, LEFT_ITALIC_TEXT_MARKUP_TOKEN.value.length + RIGHT_ITALIC_TEXT_MARKUP_TOKEN.value.length);
 			} else if (inline.startsWith(LEFT_UNDERLINED_TEXT_MARKUP_TOKEN.value) && inline.endsWith(RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN.value)) {
-				const splitUnderlinedTextPattern = new RegExp(`(?<=${LEFT_UNDERLINED_TEXT_MARKUP_TOKEN.value})|(?=${RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN.value})`);
-				const underlinedTextChunks = inline.split(splitUnderlinedTextPattern);
 				tokens.push(
 					LEFT_UNDERLINED_TEXT_MARKUP_TOKEN,
-					...this.getTokensFromRemainingText(underlinedTextChunks[1]),
+					...this.getTokensFromRemainingText(inline.substring(LEFT_UNDERLINED_TEXT_MARKUP_TOKEN.value.length, inline.length - RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN.value.length)),
 					RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN,
 				);
-				this.adjustCursor(false, underlinedTextChunks[0].length + underlinedTextChunks[2].length);
+				this.adjustCursor(false, LEFT_UNDERLINED_TEXT_MARKUP_TOKEN.value.length + RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN.value.length);
 			} else if (inline.startsWith(LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value)) {
-				const splitHighlightedTextPattern = new RegExp(`(?<=${LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value})|(?=${RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value})`);
-				const highlightedTextChunks = inline.split(splitHighlightedTextPattern);
 				tokens.push(
 					LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN,
-					...this.getTokensFromRemainingText(highlightedTextChunks[1]),
+					...this.getTokensFromRemainingText(inline.substring(LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value.length, inline.length - RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value.length)),
 					RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN,
 				);
-				this.adjustCursor(false, highlightedTextChunks[0].length + highlightedTextChunks[2].length);
+				this.adjustCursor(false, LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value.length + RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value.length);
 			} else if (inline.startsWith(LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value)) {
-				const splitStrikethroughTextPattern = new RegExp(`(?<=${LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value})|(?=${RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value})`);
-				const strikethroughTextChunks = inline.split(splitStrikethroughTextPattern);
 				tokens.push(
 					LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN,
-					...this.getTokensFromRemainingText(strikethroughTextChunks[1]),
+					...this.getTokensFromRemainingText(inline.substring(LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value.length, inline.length - RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value.length)),
 					RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN,
 				);
-				this.adjustCursor(false, strikethroughTextChunks[0].length + strikethroughTextChunks[2].length);
+				this.adjustCursor(false, LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value.length + RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value.length);
 			} else if (inline.startsWith(LINK_MARKUP_1_TOKEN.value) && inline.endsWith(LINK_MARKUP_3_TOKEN.value)) {
 				const firstLinkSplit = inline.split(LINK_MARKUP_2_TOKEN.value);
 				const secondLinkSplit = firstLinkSplit[0].split(LINK_MARKUP_1_TOKEN.value);
 				const thirdLinkSplit = firstLinkSplit[1].split(LINK_MARKUP_3_TOKEN.value);
-				const linkChunks = [
-					LINK_MARKUP_1_TOKEN.value,
-					secondLinkSplit[1],
-					LINK_MARKUP_2_TOKEN.value,
-					thirdLinkSplit[0],
-					LINK_MARKUP_3_TOKEN.value,
-				];
+				const linkChunks = [LINK_MARKUP_1_TOKEN.value, secondLinkSplit[1], LINK_MARKUP_2_TOKEN.value, thirdLinkSplit[0], LINK_MARKUP_3_TOKEN.value];
 				tokens = [
 					LINK_MARKUP_1_TOKEN,
 					...this.getTokensFromRemainingText(linkChunks[1]),

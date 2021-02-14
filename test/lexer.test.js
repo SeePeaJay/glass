@@ -72,7 +72,7 @@ describe('tests that verify proper separation of blocks and triggers', () => {
         const array = ['This is a standard paragraph.', '\n\n', 'This is another paragraph.', '\n\n', 'One final paragraph.', '\n\n', ''];
         expect(lexer.blocksAndTriggers).toStrictEqual(array);
     });
-    describe('tests on unnecessary tabs', () => {
+    describe('unnecessary tabs', () => {
         test('a normally indented block', () => {
             const input = 'This is a normal paragraph.\n\n\tAnd a normally indented paragraph.';
             lexer.processUserInput(input);
@@ -93,7 +93,7 @@ describe('tests that verify proper separation of blocks and triggers', () => {
         });
     });
 });
-describe('tests on correct production of token(s)', () => {
+describe('tests that verify token production', () => {
     test('empty string input', () => {
         const input = '';
         const receivedTokens = [];
@@ -104,24 +104,7 @@ describe('tests on correct production of token(s)', () => {
         const expectedTokens = [];
         expect(receivedTokens).toStrictEqual(expectedTokens);
     });
-    test('a single paragraph block (a single character)', () => {
-        const input = 'T';
-        const receivedTokens = [];
-        lexer.processUserInput(input);
-        let token = lexer.getNextToken();
-        while (token) {
-            receivedTokens.push(token);
-            token = lexer.getNextToken();
-        }
-        const expectedTokens = [
-            {
-                name: 'NON-CONTROL CHARACTER',
-                value: 'T',
-            },
-        ];
-        expect(receivedTokens).toStrictEqual(expectedTokens);
-    });
-    test('a single paragraph block (multiple characters)', () => {
+    test('a single paragraph block', () => {
         const input = 'This is a paragraph.';
         const receivedTokens = [];
         lexer.processUserInput(input);
@@ -534,47 +517,6 @@ describe('tests on correct production of token(s)', () => {
         ];
         expect(receivedTokens).toStrictEqual(expectedTokens);
     });
-    test('nested styles', () => {
-        const input = '`@Styles can be `/nested/`.@`';
-        const receivedTokens = [];
-        lexer.processUserInput(input);
-        let token = lexer.getNextToken();
-        while (token) {
-            receivedTokens.push(token);
-            token = lexer.getNextToken();
-        }
-        const expectedTokens = [
-            {
-                name: 'LEFT BOLD TEXT MARKUP',
-                value: '`@',
-            },
-            {
-                name: 'NON-CONTROL CHARACTERS',
-                value: 'Styles can be ',
-            },
-            {
-                name: 'LEFT ITALIC TEXT MARKUP',
-                value: '`/',
-            },
-            {
-                name: 'NON-CONTROL CHARACTERS',
-                value: 'nested',
-            },
-            {
-                name: 'RIGHT ITALIC TEXT MARKUP',
-                value: '/`',
-            },
-            {
-                name: 'NON-CONTROL CHARACTER',
-                value: '.',
-            },
-            {
-                name: 'RIGHT BOLD TEXT MARKUP',
-                value: '@`',
-            },
-        ];
-        expect(receivedTokens).toStrictEqual(expectedTokens);
-    });
     test('conjoined styles', () => {
         const input = '`@bold@` and `/italic/`';
         const receivedTokens = [];
@@ -615,5 +557,77 @@ describe('tests on correct production of token(s)', () => {
             },
         ];
         expect(receivedTokens).toStrictEqual(expectedTokens);
+    });
+    describe('nested styles', () => {
+        test('same styles should not be nested (currently)', () => {
+            const input = '`@Same styles cannot be `@nested@` currently.@`';
+            const receivedTokens = [];
+            lexer.processUserInput(input);
+            let token = lexer.getNextToken();
+            while (token) {
+                receivedTokens.push(token);
+                token = lexer.getNextToken();
+            }
+            const expectedTokens = [
+                {
+                    name: 'LEFT BOLD TEXT MARKUP',
+                    value: '`@',
+                },
+                {
+                    name: 'NON-CONTROL CHARACTERS',
+                    value: 'Same styles cannot be `@nested',
+                },
+                {
+                    name: 'RIGHT BOLD TEXT MARKUP',
+                    value: '@`',
+                },
+                {
+                    name: 'NON-CONTROL CHARACTERS',
+                    value: ' currently.@`',
+                },
+            ];
+            expect(receivedTokens).toStrictEqual(expectedTokens);
+        });
+        test('different styles should be nested', () => {
+            const input = '`@Different styles should be `/nested/`.@`';
+            const receivedTokens = [];
+            lexer.processUserInput(input);
+            let token = lexer.getNextToken();
+            while (token) {
+                receivedTokens.push(token);
+                token = lexer.getNextToken();
+            }
+            const expectedTokens = [
+                {
+                    name: 'LEFT BOLD TEXT MARKUP',
+                    value: '`@',
+                },
+                {
+                    name: 'NON-CONTROL CHARACTERS',
+                    value: 'Different styles should be ',
+                },
+                {
+                    name: 'LEFT ITALIC TEXT MARKUP',
+                    value: '`/',
+                },
+                {
+                    name: 'NON-CONTROL CHARACTERS',
+                    value: 'nested',
+                },
+                {
+                    name: 'RIGHT ITALIC TEXT MARKUP',
+                    value: '/`',
+                },
+                {
+                    name: 'NON-CONTROL CHARACTERS',
+                    value: '.',
+                },
+                {
+                    name: 'RIGHT BOLD TEXT MARKUP',
+                    value: '@`',
+                },
+            ];
+            expect(receivedTokens).toStrictEqual(expectedTokens);
+        });
     });
 });

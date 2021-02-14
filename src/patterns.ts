@@ -7,7 +7,7 @@ const UNORDERED_LIST_MARKUP_PATTERN = /^\* /;
 const ORDERED_LIST_MARKUP_PATTERN = /^\d+. /;
 const HORIZONTAL_RULE_MARKUP_PATTERN = /^--- /;
 const IMAGE_MARKUP_PATTERN = /image:.+{}/;
-const BOLD_TEXT_PATTERN = /`@.+@`/;
+const BOLD_TEXT_PATTERN = /`@.+?@`/;
 const ITALIC_TEXT_PATTERN = /`\/.+\/`/;
 const UNDERLINED_TEXT_PATTERN = /`_.+_`/;
 const HIGHLIGHTED_TEXT_PATTERN = /`=.+=`/;
