@@ -4,17 +4,15 @@ const patterns_1 = require("./patterns");
 const markup_tokens_1 = require("./markup_tokens");
 class Lexer {
     constructor() {
-        this.userInput = '';
         this.blocksAndTriggers = [];
         this.cursor = [0, 0];
         this.tokenQueue = [];
     }
-    processUserInput(input) {
-        this.userInput = input;
+    processUserInput(userInput) {
         this.blocksAndTriggers = [];
         this.cursor = [0, 0];
         this.tokenQueue = [];
-        this.splitUserInputIntoBlocksAndTriggers(this.userInput);
+        this.splitUserInputIntoBlocksAndTriggers(userInput);
         this.removeUnnecessaryTabsFromBlocksAndTriggers();
         // process tabs in blocksandtriggers here
     }
@@ -54,6 +52,10 @@ class Lexer {
         return this.getTokenFromEngram();
     }
     getTokenFromEngram() {
+        if (this.blocksAndTriggers[this.cursor[0]] === '') {
+            this.adjustCursor(true, 0);
+            return markup_tokens_1.BLANK_LINE_TOKEN;
+        }
         // block triggers
         if (this.cursor[0] % 2) {
             return this.getTokenFromBlockTrigger();
@@ -199,12 +201,8 @@ class Lexer {
         return tokens;
     }
     adjustCursor(shouldIncrement, offset) {
-        if (shouldIncrement) {
-            this.cursor[0]++;
-            this.cursor[1] = 0;
-        }
         this.cursor[1] += offset;
-        if (this.cursor[1] === this.blocksAndTriggers[this.cursor[0]].length) {
+        if (shouldIncrement || (this.cursor[1] === this.blocksAndTriggers[this.cursor[0]].length)) {
             this.cursor[0]++;
             this.cursor[1] = 0;
         }

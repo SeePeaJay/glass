@@ -687,5 +687,31 @@ describe('tests that verify token production', () => {
 			];
 			expect(receivedTokens).toStrictEqual(expectedTokens);
 		});
+
+		test('two empty blocks separated by \\n\\n', () => {
+			const input = '\n\n';
+			const receivedTokens: Token[] = [];
+			lexer.processUserInput(input);
+			let token = lexer.getNextToken();
+			while (token) {
+				receivedTokens.push(token!);
+				token = lexer.getNextToken();
+			}
+			const expectedTokens: Token[] = [
+				{
+					name: 'BLANK LINE',
+					value: '',
+				},
+				{
+					name: 'NEW BLOCK TRIGGER',
+					value: '\n\n',
+				},
+				{
+					name: 'BLANK LINE',
+					value: '',
+				},
+			];
+			expect(receivedTokens).toStrictEqual(expectedTokens);
+		});
 	});
 });

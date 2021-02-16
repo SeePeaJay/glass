@@ -3,29 +3,26 @@ import {
 	TRIGGER_PATTERN, HEADING_1_MARKUP_PATTERN, HEADING_2_MARKUP_PATTERN, HEADING_3_MARKUP_PATTERN, UNORDERED_LIST_MARKUP_PATTERN, ORDERED_LIST_MARKUP_PATTERN, HORIZONTAL_RULE_MARKUP_PATTERN, IMAGE_MARKUP_PATTERN, BOLD_TEXT_PATTERN, ITALIC_TEXT_PATTERN, UNDERLINED_TEXT_PATTERN, HIGHLIGHTED_TEXT_PATTERN, STRIKETHROUGH_TEXT_PATTERN, LINK_PATTERN,
 } from './patterns';
 import {
-	HEADING_1_MARKUP_TOKEN, HEADING_2_MARKUP_TOKEN, HEADING_3_MARKUP_TOKEN, UNORDERED_LIST_MARKUP_TOKEN, HORIZONTAL_RULE_MARKUP_TOKEN, IMAGE_MARKUP_1_TOKEN, IMAGE_MARKUP_2_TOKEN, LEFT_BOLD_TEXT_MARKUP_TOKEN, RIGHT_BOLD_TEXT_MARKUP_TOKEN, LEFT_ITALIC_TEXT_MARKUP_TOKEN, RIGHT_ITALIC_TEXT_MARKUP_TOKEN, LEFT_UNDERLINED_TEXT_MARKUP_TOKEN, RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN, LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, LINK_MARKUP_1_TOKEN, LINK_MARKUP_2_TOKEN, LINK_MARKUP_3_TOKEN,
+	HEADING_1_MARKUP_TOKEN, HEADING_2_MARKUP_TOKEN, HEADING_3_MARKUP_TOKEN, UNORDERED_LIST_MARKUP_TOKEN, HORIZONTAL_RULE_MARKUP_TOKEN, IMAGE_MARKUP_1_TOKEN, IMAGE_MARKUP_2_TOKEN, LEFT_BOLD_TEXT_MARKUP_TOKEN, RIGHT_BOLD_TEXT_MARKUP_TOKEN, LEFT_ITALIC_TEXT_MARKUP_TOKEN, RIGHT_ITALIC_TEXT_MARKUP_TOKEN, LEFT_UNDERLINED_TEXT_MARKUP_TOKEN, RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN, LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, LINK_MARKUP_1_TOKEN, LINK_MARKUP_2_TOKEN, LINK_MARKUP_3_TOKEN, BLANK_LINE_TOKEN,
 } from './markup_tokens';
 
 class Lexer {
-	userInput: string;
 	blocksAndTriggers: string[];
     cursor: number[];
     tokenQueue: Token[];
 
     constructor() {
-		this.userInput = '';
 		this.blocksAndTriggers = [];
         this.cursor = [0, 0];
 		this.tokenQueue = [];
     }
 
-    processUserInput(input: string) {
-		this.userInput = input;
+    processUserInput(userInput: string) {
 		this.blocksAndTriggers = [];
 		this.cursor = [0, 0];
 		this.tokenQueue = [];
 
-		this.splitUserInputIntoBlocksAndTriggers(this.userInput);
+		this.splitUserInputIntoBlocksAndTriggers(userInput);
 		this.removeUnnecessaryTabsFromBlocksAndTriggers();
 		// process tabs in blocksandtriggers here
     }
@@ -72,6 +69,11 @@ class Lexer {
     }
 
     getTokenFromEngram() {
+		if (this.blocksAndTriggers[this.cursor[0]] === '') {
+			this.adjustCursor(true, 0);
+			return BLANK_LINE_TOKEN;
+		}
+
 		// block triggers
 		if (this.cursor[0] % 2) {
 			return this.getTokenFromBlockTrigger();
@@ -248,12 +250,8 @@ class Lexer {
 	}
 
 	adjustCursor(shouldIncrement: boolean, offset: number) {
-		if (shouldIncrement) {
-			this.cursor[0]++;
-			this.cursor[1] = 0;
-		}
 		this.cursor[1] += offset;
-		if (this.cursor[1] === this.blocksAndTriggers[this.cursor[0]].length) {
+		if (shouldIncrement || (this.cursor[1] === this.blocksAndTriggers[this.cursor[0]].length)) {
 			this.cursor[0]++;
 			this.cursor[1] = 0;
 		}
