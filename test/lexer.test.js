@@ -679,5 +679,17 @@ describe('tests that verify token production', () => {
             ];
             expect(receivedTokens).toStrictEqual(expectedTokens);
         });
+        test('paragraph with newlines at both ends', () => {
+            const input = '\nok hello there\n\n\nA new hope?!';
+            const receivedTokens = [];
+            lexer.processUserInput(input);
+            let token = lexer.getNextToken();
+            while (token) {
+                receivedTokens.push(token);
+                token = lexer.getNextToken();
+            }
+            const expectedTokens = [];
+            expect(receivedTokens).toStrictEqual(expectedTokens);
+        });
     });
 });

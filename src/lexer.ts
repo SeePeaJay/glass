@@ -151,10 +151,13 @@ class Lexer {
 	getTokensFromImageMarkup(imageMarkup: string) {
 		const tokens = [
 			IMAGE_MARKUP_1_TOKEN,
-			...this.getTokensFromRemainingText(imageMarkup.substring(IMAGE_MARKUP_1_TOKEN.value.length, imageMarkup.length - IMAGE_MARKUP_2_TOKEN.value.length)),
+			{
+				name: 'IMAGE PATH',
+				value: imageMarkup.substring(IMAGE_MARKUP_1_TOKEN.value.length, imageMarkup.length - IMAGE_MARKUP_2_TOKEN.value.length),
+			},
 			IMAGE_MARKUP_2_TOKEN,
 		];
-		this.adjustCursor(false, IMAGE_MARKUP_1_TOKEN.value.length + IMAGE_MARKUP_2_TOKEN.value.length);
+		this.adjustCursor(false, imageMarkup.length);
 		return tokens;
 	}
 
@@ -170,7 +173,7 @@ class Lexer {
 		if (!inlineMatch) {
 			tokens = [
 				{
-					name: 'NON-CONTROL CHARACTERS',
+					name: 'TEXT',
 					value: remainingText,
 				},
 			];
@@ -182,7 +185,7 @@ class Lexer {
 			if (unmatchedTexts[0].length) {
 				tokens.push(
 					{
-						name: 'NON-CONTROL CHARACTERS',
+						name: 'TEXT',
 						value: unmatchedTexts[0],
 					},
 				);
@@ -235,10 +238,13 @@ class Lexer {
 					LINK_MARKUP_1_TOKEN,
 					...this.getTokensFromRemainingText(linkChunks[1]),
 					LINK_MARKUP_2_TOKEN,
-					...this.getTokensFromRemainingText(linkChunks[3]),
+					{
+						name: 'LINK URL',
+						value: linkChunks[3],
+					},
 					LINK_MARKUP_3_TOKEN,
 				];
-				this.adjustCursor(false, linkChunks[0].length + linkChunks[2].length + linkChunks[4].length);
+				this.adjustCursor(false, linkChunks[0].length + linkChunks[2].length + linkChunks[3].length + linkChunks[4].length);
 			}
 
 			if (unmatchedTexts[1].length) {
