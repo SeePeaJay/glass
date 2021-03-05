@@ -1,7 +1,7 @@
 import Lexer from './lexer';
 import { Token, ASTNode } from './types';
 import {
-	HEADING_1_MARKUP_TOKEN, HEADING_2_MARKUP_TOKEN, HEADING_3_MARKUP_TOKEN, UNORDERED_LIST_MARKUP_TOKEN, HORIZONTAL_RULE_MARKUP_TOKEN, IMAGE_MARKUP_1_TOKEN, // IMAGE_MARKUP_2_TOKEN, LEFT_BOLD_TEXT_MARKUP_TOKEN, RIGHT_BOLD_TEXT_MARKUP_TOKEN, LEFT_ITALIC_TEXT_MARKUP_TOKEN, RIGHT_ITALIC_TEXT_MARKUP_TOKEN, LEFT_UNDERLINED_TEXT_MARKUP_TOKEN, RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN, LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, LINK_MARKUP_1_TOKEN, LINK_MARKUP_2_TOKEN, LINK_MARKUP_3_TOKEN,
+	HEADING_1_MARKUP_TOKEN, HEADING_2_MARKUP_TOKEN, HEADING_3_MARKUP_TOKEN, UNORDERED_LIST_MARKUP_TOKEN, HORIZONTAL_RULE_MARKUP_TOKEN, IMAGE_MARKUP_1_TOKEN, IMAGE_MARKUP_2_TOKEN, // LEFT_BOLD_TEXT_MARKUP_TOKEN, RIGHT_BOLD_TEXT_MARKUP_TOKEN, LEFT_ITALIC_TEXT_MARKUP_TOKEN, RIGHT_ITALIC_TEXT_MARKUP_TOKEN, LEFT_UNDERLINED_TEXT_MARKUP_TOKEN, RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN, LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, LINK_MARKUP_1_TOKEN, LINK_MARKUP_2_TOKEN, LINK_MARKUP_3_TOKEN,
 } from './markup_tokens';
 
 class Parser {
@@ -22,9 +22,9 @@ class Parser {
     getEngram(): ASTNode {
 		const engramValue: ASTNode[] = [];
 
-		if (this.lookahead) {
+		if (this.lookahead && this.lookahead.name !== 'NEW BLOCK TRIGGER' && this.lookahead.name !== 'NEW INDENTED BLOCK TRIGGER') {
 			engramValue.push(this.getBlock());
-			while (this.lookahead) {
+			while (this.lookahead && this.lookahead.name === 'NEW BLOCK TRIGGER') {
 				engramValue.push(this.getNewBlockTrigger());
 				engramValue.push(this.getBlock());
 			}
@@ -88,7 +88,7 @@ class Parser {
 	}
 
 	getNewBlockTrigger() {
-		const token = this.eat('NEW BLOCK TRIGGER');
+		const token = this.eatToken('NEW BLOCK TRIGGER');
         return {
             name: 'NEW BLOCK TRIGGER',
             value: token.value,
@@ -96,7 +96,7 @@ class Parser {
 	}
 
 	getNewIndentedBlockTrigger() {
-		const token = this.eat('NEW INDENTED BLOCK TRIGGER');
+		const token = this.eatToken('NEW INDENTED BLOCK TRIGGER');
         return {
             name: 'NEW INDENTED BLOCK TRIGGER',
             value: token.value,
@@ -104,15 +104,15 @@ class Parser {
 	}
 
 	getHeading1Block(): ASTNode {
-		const heading1MarkupToken = this.eat(HEADING_1_MARKUP_TOKEN.name);
+		const heading1MarkupToken = this.eatToken(HEADING_1_MARKUP_TOKEN.name);
 		const heading1BlockValue: ASTNode[] = [{
 			name: heading1MarkupToken.name,
 			value: heading1MarkupToken.value,
 		}];
-		if (this.lookahead) {
+		if (this.lookahead && this.lookahead.name === 'TEXT') {
 			heading1BlockValue.push(this.getText());
 		}
-		while (this.lookahead) {
+		while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
 			heading1BlockValue.push(this.getNewIndentedBlockTrigger());
 			heading1BlockValue.push(this.getBlock());
 		}
@@ -123,15 +123,15 @@ class Parser {
 	}
 
 	getHeading2Block(): ASTNode {
-		const heading2MarkupToken = this.eat(HEADING_2_MARKUP_TOKEN.name);
+		const heading2MarkupToken = this.eatToken(HEADING_2_MARKUP_TOKEN.name);
 		const heading2BlockValue: ASTNode[] = [{
 			name: heading2MarkupToken.name,
 			value: heading2MarkupToken.value,
 		}];
-		if (this.lookahead) {
+		if (this.lookahead && this.lookahead.name === 'TEXT') {
 			heading2BlockValue.push(this.getText());
 		}
-		while (this.lookahead) {
+		while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
 			heading2BlockValue.push(this.getNewIndentedBlockTrigger());
 			heading2BlockValue.push(this.getBlock());
 		}
@@ -142,15 +142,15 @@ class Parser {
 	}
 
 	getHeading3Block(): ASTNode {
-		const heading3MarkupToken = this.eat(HEADING_3_MARKUP_TOKEN.name);
+		const heading3MarkupToken = this.eatToken(HEADING_3_MARKUP_TOKEN.name);
 		const heading3BlockValue: ASTNode[] = [{
 			name: heading3MarkupToken.name,
 			value: heading3MarkupToken.value,
 		}];
-		if (this.lookahead) {
+		if (this.lookahead && this.lookahead.name === 'TEXT') {
 			heading3BlockValue.push(this.getText());
 		}
-		while (this.lookahead) {
+		while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
 			heading3BlockValue.push(this.getNewIndentedBlockTrigger());
 			heading3BlockValue.push(this.getBlock());
 		}
@@ -161,15 +161,15 @@ class Parser {
 	}
 
 	getUnorderedListBlock(): ASTNode {
-		const unorderedListMarkupToken = this.eat(UNORDERED_LIST_MARKUP_TOKEN.name);
+		const unorderedListMarkupToken = this.eatToken(UNORDERED_LIST_MARKUP_TOKEN.name);
 		const unorderedListBlockValue: ASTNode[] = [{
 			name: unorderedListMarkupToken.name,
 			value: unorderedListMarkupToken.value,
 		}];
-		if (this.lookahead) {
+		if (this.lookahead && this.lookahead.name === 'TEXT') {
 			unorderedListBlockValue.push(this.getText());
 		}
-		while (this.lookahead) {
+		while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
 			unorderedListBlockValue.push(this.getNewIndentedBlockTrigger());
 			unorderedListBlockValue.push(this.getBlock());
 		}
@@ -180,15 +180,15 @@ class Parser {
 	}
 
 	getOrderedListBlock(): ASTNode {
-		const orderedListMarkupToken = this.eat('ORDERED LIST MARKUP');
+		const orderedListMarkupToken = this.eatToken('ORDERED LIST MARKUP');
 		const orderedListBlockValue: ASTNode[] = [{
 			name: orderedListMarkupToken.name,
 			value: orderedListMarkupToken.value,
 		}];
-		if (this.lookahead) {
+		if (this.lookahead && this.lookahead.name === 'TEXT') {
 			orderedListBlockValue.push(this.getText());
 		}
-		while (this.lookahead) {
+		while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
 			orderedListBlockValue.push(this.getNewIndentedBlockTrigger());
 			orderedListBlockValue.push(this.getBlock());
 		}
@@ -199,15 +199,15 @@ class Parser {
 	}
 
 	getHorizontalRuleBlock(): ASTNode {
-		const horizontalRuleMarkupToken = this.eat(HORIZONTAL_RULE_MARKUP_TOKEN.name);
+		const horizontalRuleMarkupToken = this.eatToken(HORIZONTAL_RULE_MARKUP_TOKEN.name);
 		const horizontalRuleBlockValue: ASTNode[] = [{
 			name: horizontalRuleMarkupToken.name,
 			value: horizontalRuleMarkupToken.value,
 		}];
-		if (this.lookahead) {
+		if (this.lookahead && this.lookahead.name === 'TEXT') {
 			horizontalRuleBlockValue.push(this.getText());
 		}
-		while (this.lookahead) {
+		while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
 			horizontalRuleBlockValue.push(this.getNewIndentedBlockTrigger());
 			horizontalRuleBlockValue.push(this.getBlock());
 		}
@@ -217,32 +217,48 @@ class Parser {
 		};
 	}
 
-	// getParagraphBlock(): ASTNode {
-	// 	const horizontalRuleBlockValue: ASTNode[] = [];
+	getParagraphBlock(): ASTNode {
+		const paragraphBlockValue: ASTNode[] = [];
+		if (this.lookahead!.name === 'BLANK LINE') {
+			paragraphBlockValue.push(this.getBlankLine());
+		} else {
+			paragraphBlockValue.push(this.getText());
+		}
+		while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
+			paragraphBlockValue.push(this.getNewIndentedBlockTrigger());
+			paragraphBlockValue.push(this.getBlock());
+		}
+		return {
+			name: 'PARAGRAPH BLOCK',
+			value: paragraphBlockValue,
+		};
+	}
 
-	// 	switch (this.lookahead!.name) {
-	// 		case 'BLANK LINE':
-	// 			horizontalRuleBlockValue.push();
-	// 		case ''
-	// 	}
-	// 	if (this.lookahead) {
-	// 		horizontalRuleBlockValue.push(this.getText());
-	// 	}
-	// 	while (this.lookahead) {
-	// 		horizontalRuleBlockValue.push(this.getNewIndentedBlockTrigger());
-	// 		horizontalRuleBlockValue.push(this.getBlock());
-	// 	}
-	// 	return {
-	// 		name: 'HORIZONTAL RULE BLOCK',
-	// 		value: horizontalRuleBlockValue,
-	// 	};
-	// }
+	getImage(): ASTNode {
+		const imageMarkup1Token = this.eatToken(IMAGE_MARKUP_1_TOKEN.name);
+		const imagePathToken = this.eatToken('IMAGE PATH');
+		const imageMarkup2Token = this.eatToken(IMAGE_MARKUP_2_TOKEN.name);
+		const imageValue: ASTNode[] = [
+			{
+				name: imageMarkup1Token.name,
+				value: imageMarkup1Token.value,
+			},
+			{
+				name: imagePathToken.name,
+				value: imagePathToken.value,
+			},
+			{
+				name: imageMarkup1Token.name,
+				value: imageMarkup2Token.value,
+			},
+		];
+		return {
+			name: 'IMAGE',
+			value: imageValue,
+		};
+	}
 
-	// getImage(): ASTNode {
-
-	// }
-
-    eat(tokenName: string): Token {
+    eatToken(tokenName: string): Token {
         const token = this.lookahead;
 
         if (token == null) {
@@ -252,7 +268,7 @@ class Parser {
         }
         if (token.name !== tokenName) {
             throw new SyntaxError(
-                `Unexpected end of input, expected: "${tokenName}"`,
+                `Unexpected token ${token.value}, expected: "${tokenName}"`,
             );
         }
         this.lookahead = this.lexer.getNextToken();
