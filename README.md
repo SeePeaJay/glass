@@ -1,6 +1,6 @@
 # glass
  
-Glass is a recursive-descent parser, for a Markdown-esque language I am currently designing.
+Glass is a recursive-descent parser for a Markdown-esque language I am currently designing.
 
 Right now, it supports the following basic syntax:
 
@@ -14,7 +14,7 @@ Heading
 List
 ```
 1. An ordered list item
-. an unordered list item
+. An unordered list item
 ```
 
 Horizontal rule
