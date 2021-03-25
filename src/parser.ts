@@ -110,7 +110,7 @@ class Parser {
 			value: heading1MarkupToken.value,
 		}];
 		if (this.lookahead && this.lookahead.name === 'TEXT') {
-			heading1BlockValue.push(this.getText());
+			// heading1BlockValue.push(this.getText());
 		}
 		while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
 			heading1BlockValue.push(this.getNewIndentedBlockTrigger());
@@ -129,7 +129,7 @@ class Parser {
 			value: heading2MarkupToken.value,
 		}];
 		if (this.lookahead && this.lookahead.name === 'TEXT') {
-			heading2BlockValue.push(this.getText());
+			// heading2BlockValue.push(this.getText());
 		}
 		while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
 			heading2BlockValue.push(this.getNewIndentedBlockTrigger());
@@ -148,7 +148,7 @@ class Parser {
 			value: heading3MarkupToken.value,
 		}];
 		if (this.lookahead && this.lookahead.name === 'TEXT') {
-			heading3BlockValue.push(this.getText());
+			// heading3BlockValue.push(this.getText());
 		}
 		while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
 			heading3BlockValue.push(this.getNewIndentedBlockTrigger());
@@ -167,7 +167,7 @@ class Parser {
 			value: unorderedListMarkupToken.value,
 		}];
 		if (this.lookahead && this.lookahead.name === 'TEXT') {
-			unorderedListBlockValue.push(this.getText());
+			// unorderedListBlockValue.push(this.getText());
 		}
 		while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
 			unorderedListBlockValue.push(this.getNewIndentedBlockTrigger());
@@ -186,7 +186,7 @@ class Parser {
 			value: orderedListMarkupToken.value,
 		}];
 		if (this.lookahead && this.lookahead.name === 'TEXT') {
-			orderedListBlockValue.push(this.getText());
+			// orderedListBlockValue.push(this.getText());
 		}
 		while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
 			orderedListBlockValue.push(this.getNewIndentedBlockTrigger());
@@ -205,7 +205,7 @@ class Parser {
 			value: horizontalRuleMarkupToken.value,
 		}];
 		if (this.lookahead && this.lookahead.name === 'TEXT') {
-			horizontalRuleBlockValue.push(this.getText());
+			// horizontalRuleBlockValue.push(this.getText());
 		}
 		while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
 			horizontalRuleBlockValue.push(this.getNewIndentedBlockTrigger());
@@ -220,9 +220,9 @@ class Parser {
 	getParagraphBlock(): ASTNode {
 		const paragraphBlockValue: ASTNode[] = [];
 		if (this.lookahead!.name === 'BLANK LINE') {
-			paragraphBlockValue.push(this.getBlankLine());
+			// paragraphBlockValue.push(this.getBlankLine());
 		} else {
-			paragraphBlockValue.push(this.getText());
+			// paragraphBlockValue.push(this.getText());
 		}
 		while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
 			paragraphBlockValue.push(this.getNewIndentedBlockTrigger());

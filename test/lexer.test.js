@@ -116,7 +116,7 @@ describe('tests that verify token production', () => {
             }
             const expectedTokens = [
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'This is a paragraph.',
                 },
             ];
@@ -133,7 +133,7 @@ describe('tests that verify token production', () => {
             }
             const expectedTokens = [
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'This is a \n paragraph.',
                 },
             ];
@@ -154,7 +154,7 @@ describe('tests that verify token production', () => {
                     value: '=1= ',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'Heading 1',
                 },
             ];
@@ -175,7 +175,7 @@ describe('tests that verify token production', () => {
                     value: '=2= ',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'Heading 2',
                 },
             ];
@@ -196,7 +196,7 @@ describe('tests that verify token production', () => {
                     value: '=3= ',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'Heading 3',
                 },
             ];
@@ -217,7 +217,7 @@ describe('tests that verify token production', () => {
                     value: '* ',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'list',
                 },
             ];
@@ -238,7 +238,7 @@ describe('tests that verify token production', () => {
                     value: '12. ',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'list',
                 },
             ];
@@ -276,7 +276,7 @@ describe('tests that verify token production', () => {
                     value: 'image:',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'IMAGE PATH',
                     value: 'path.jpg',
                 },
                 {
@@ -301,7 +301,7 @@ describe('tests that verify token production', () => {
                     value: '`@',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'bold text',
                 },
                 {
@@ -326,7 +326,7 @@ describe('tests that verify token production', () => {
                     value: '`/',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'italic text',
                 },
                 {
@@ -351,7 +351,7 @@ describe('tests that verify token production', () => {
                     value: '`_',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'underlined text',
                 },
                 {
@@ -362,7 +362,7 @@ describe('tests that verify token production', () => {
             expect(receivedTokens).toStrictEqual(expectedTokens);
         });
         test('a single highlighted text', () => {
-            const input = '`=highlighted text=`';
+            const input = '`=\nhighlighted text\n=`';
             const receivedTokens = [];
             lexer.processUserInput(input);
             let token = lexer.getNextToken();
@@ -376,8 +376,8 @@ describe('tests that verify token production', () => {
                     value: '`=',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
-                    value: 'highlighted text',
+                    name: 'TEXT',
+                    value: '\nhighlighted text\n',
                 },
                 {
                     name: 'RIGHT HIGHLIGHTED TEXT MARKUP',
@@ -401,7 +401,7 @@ describe('tests that verify token production', () => {
                     value: '`-',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'strikethrough text',
                 },
                 {
@@ -426,7 +426,7 @@ describe('tests that verify token production', () => {
                     value: '`_',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'link alias',
                 },
                 {
@@ -434,7 +434,7 @@ describe('tests that verify token production', () => {
                     value: '_(',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'LINK URL',
                     value: 'www.example.com',
                 },
                 {
@@ -455,7 +455,7 @@ describe('tests that verify token production', () => {
             }
             const expectedTokens = [
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'A paragraph that has both ',
                 },
                 {
@@ -463,7 +463,7 @@ describe('tests that verify token production', () => {
                     value: '`@',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'bold',
                 },
                 {
@@ -471,7 +471,7 @@ describe('tests that verify token production', () => {
                     value: '@`',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: ' and ',
                 },
                 {
@@ -479,7 +479,7 @@ describe('tests that verify token production', () => {
                     value: '`/',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'italic',
                 },
                 {
@@ -487,7 +487,7 @@ describe('tests that verify token production', () => {
                     value: '/`',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: ' text.',
                 },
             ];
@@ -509,16 +509,12 @@ describe('tests that verify token production', () => {
                         value: '`@',
                     },
                     {
-                        name: 'NON-CONTROL CHARACTERS',
-                        value: 'Same styles cannot be `@nested',
+                        name: 'TEXT',
+                        value: 'Same styles cannot be `@nested@` currently.',
                     },
                     {
                         name: 'RIGHT BOLD TEXT MARKUP',
                         value: '@`',
-                    },
-                    {
-                        name: 'NON-CONTROL CHARACTERS',
-                        value: ' currently.@`',
                     },
                 ];
                 expect(receivedTokens).toStrictEqual(expectedTokens);
@@ -538,7 +534,7 @@ describe('tests that verify token production', () => {
                         value: '`@',
                     },
                     {
-                        name: 'NON-CONTROL CHARACTERS',
+                        name: 'TEXT',
                         value: 'Different styles should be ',
                     },
                     {
@@ -546,7 +542,7 @@ describe('tests that verify token production', () => {
                         value: '`/',
                     },
                     {
-                        name: 'NON-CONTROL CHARACTERS',
+                        name: 'TEXT',
                         value: 'nested',
                     },
                     {
@@ -554,7 +550,7 @@ describe('tests that verify token production', () => {
                         value: '/`',
                     },
                     {
-                        name: 'NON-CONTROL CHARACTERS',
+                        name: 'TEXT',
                         value: '.',
                     },
                     {
@@ -582,7 +578,7 @@ describe('tests that verify token production', () => {
                     value: '=1= ',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'A heading',
                 },
                 {
@@ -590,7 +586,7 @@ describe('tests that verify token production', () => {
                     value: '\n\n',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'A standard paragraph.',
                 },
             ];
@@ -611,7 +607,7 @@ describe('tests that verify token production', () => {
                     value: '=1= ',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'A heading',
                 },
                 {
@@ -619,7 +615,7 @@ describe('tests that verify token production', () => {
                     value: '\n\n\t',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'An indented paragraph.',
                 },
             ];
@@ -640,7 +636,7 @@ describe('tests that verify token production', () => {
                     value: '=1= ',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'A heading',
                 },
                 {
@@ -648,7 +644,7 @@ describe('tests that verify token production', () => {
                     value: '\n\t',
                 },
                 {
-                    name: 'NON-CONTROL CHARACTERS',
+                    name: 'TEXT',
                     value: 'An indented paragraph.',
                 },
             ];
@@ -688,7 +684,36 @@ describe('tests that verify token production', () => {
                 receivedTokens.push(token);
                 token = lexer.getNextToken();
             }
-            const expectedTokens = [];
+            const expectedTokens = [
+                {
+                    name: 'BLANK LINE',
+                    value: '',
+                },
+                {
+                    name: 'NEW BLOCK TRIGGER',
+                    value: '\n',
+                },
+                {
+                    name: 'TEXT',
+                    value: 'ok hello there',
+                },
+                {
+                    name: 'NEW BLOCK TRIGGER',
+                    value: '\n\n',
+                },
+                {
+                    name: 'BLANK LINE',
+                    value: '',
+                },
+                {
+                    name: 'NEW BLOCK TRIGGER',
+                    value: '\n',
+                },
+                {
+                    name: 'TEXT',
+                    value: 'A new hope?!',
+                },
+            ];
             expect(receivedTokens).toStrictEqual(expectedTokens);
         });
     });

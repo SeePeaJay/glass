@@ -533,22 +533,18 @@ describe('tests that verify token production', () => {
 					token = lexer.getNextToken();
 				}
 				const expectedTokens: Token[] = [
-					// {
-					// 	name: 'LEFT BOLD TEXT MARKUP',
-					// 	value: '`@',
-					// },
-					// {
-					// 	name: 'TEXT',
-					// 	value: 'Same styles cannot be `@nested',
-					// },
-					// {
-					// 	name: 'RIGHT BOLD TEXT MARKUP',
-					// 	value: '@`',
-					// },
-					// {
-					// 	name: 'TEXT',
-					// 	value: ' currently.@`',
-					// },
+					{
+						name: 'LEFT BOLD TEXT MARKUP',
+						value: '`@',
+					},
+					{
+						name: 'TEXT',
+						value: 'Same styles cannot be `@nested@` currently.',
+					},
+					{
+						name: 'RIGHT BOLD TEXT MARKUP',
+						value: '@`',
+					},
 				];
 				expect(receivedTokens).toStrictEqual(expectedTokens);
 			});
@@ -730,7 +726,7 @@ describe('tests that verify token production', () => {
 				},
 				{
 					name: 'NEW BLOCK TRIGGER',
-					value: '\n'
+					value: '\n',
 				},
 				{
 					name: 'TEXT',

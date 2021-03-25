@@ -17,9 +17,9 @@ class Parser {
     }
     getEngram() {
         const engramValue = [];
-        if (this.lookahead) {
+        if (this.lookahead && this.lookahead.name !== 'NEW BLOCK TRIGGER' && this.lookahead.name !== 'NEW INDENTED BLOCK TRIGGER') {
             engramValue.push(this.getBlock());
-            while (this.lookahead) {
+            while (this.lookahead && this.lookahead.name === 'NEW BLOCK TRIGGER') {
                 engramValue.push(this.getNewBlockTrigger());
                 engramValue.push(this.getBlock());
             }
@@ -78,29 +78,29 @@ class Parser {
         };
     }
     getNewBlockTrigger() {
-        const token = this.eat('NEW BLOCK TRIGGER');
+        const token = this.eatToken('NEW BLOCK TRIGGER');
         return {
             name: 'NEW BLOCK TRIGGER',
             value: token.value,
         };
     }
     getNewIndentedBlockTrigger() {
-        const token = this.eat('NEW INDENTED BLOCK TRIGGER');
+        const token = this.eatToken('NEW INDENTED BLOCK TRIGGER');
         return {
             name: 'NEW INDENTED BLOCK TRIGGER',
             value: token.value,
         };
     }
     getHeading1Block() {
-        const heading1MarkupToken = this.eat(markup_tokens_1.HEADING_1_MARKUP_TOKEN.name);
+        const heading1MarkupToken = this.eatToken(markup_tokens_1.HEADING_1_MARKUP_TOKEN.name);
         const heading1BlockValue = [{
                 name: heading1MarkupToken.name,
                 value: heading1MarkupToken.value,
             }];
-        if (this.lookahead) {
-            heading1BlockValue.push(this.getText());
+        if (this.lookahead && this.lookahead.name === 'TEXT') {
+            // heading1BlockValue.push(this.getText());
         }
-        while (this.lookahead) {
+        while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
             heading1BlockValue.push(this.getNewIndentedBlockTrigger());
             heading1BlockValue.push(this.getBlock());
         }
@@ -110,15 +110,15 @@ class Parser {
         };
     }
     getHeading2Block() {
-        const heading2MarkupToken = this.eat(markup_tokens_1.HEADING_2_MARKUP_TOKEN.name);
+        const heading2MarkupToken = this.eatToken(markup_tokens_1.HEADING_2_MARKUP_TOKEN.name);
         const heading2BlockValue = [{
                 name: heading2MarkupToken.name,
                 value: heading2MarkupToken.value,
             }];
-        if (this.lookahead) {
-            heading2BlockValue.push(this.getText());
+        if (this.lookahead && this.lookahead.name === 'TEXT') {
+            // heading2BlockValue.push(this.getText());
         }
-        while (this.lookahead) {
+        while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
             heading2BlockValue.push(this.getNewIndentedBlockTrigger());
             heading2BlockValue.push(this.getBlock());
         }
@@ -128,15 +128,15 @@ class Parser {
         };
     }
     getHeading3Block() {
-        const heading3MarkupToken = this.eat(markup_tokens_1.HEADING_3_MARKUP_TOKEN.name);
+        const heading3MarkupToken = this.eatToken(markup_tokens_1.HEADING_3_MARKUP_TOKEN.name);
         const heading3BlockValue = [{
                 name: heading3MarkupToken.name,
                 value: heading3MarkupToken.value,
             }];
-        if (this.lookahead) {
-            heading3BlockValue.push(this.getText());
+        if (this.lookahead && this.lookahead.name === 'TEXT') {
+            // heading3BlockValue.push(this.getText());
         }
-        while (this.lookahead) {
+        while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
             heading3BlockValue.push(this.getNewIndentedBlockTrigger());
             heading3BlockValue.push(this.getBlock());
         }
@@ -146,15 +146,15 @@ class Parser {
         };
     }
     getUnorderedListBlock() {
-        const unorderedListMarkupToken = this.eat(markup_tokens_1.UNORDERED_LIST_MARKUP_TOKEN.name);
+        const unorderedListMarkupToken = this.eatToken(markup_tokens_1.UNORDERED_LIST_MARKUP_TOKEN.name);
         const unorderedListBlockValue = [{
                 name: unorderedListMarkupToken.name,
                 value: unorderedListMarkupToken.value,
             }];
-        if (this.lookahead) {
-            unorderedListBlockValue.push(this.getText());
+        if (this.lookahead && this.lookahead.name === 'TEXT') {
+            // unorderedListBlockValue.push(this.getText());
         }
-        while (this.lookahead) {
+        while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
             unorderedListBlockValue.push(this.getNewIndentedBlockTrigger());
             unorderedListBlockValue.push(this.getBlock());
         }
@@ -164,15 +164,15 @@ class Parser {
         };
     }
     getOrderedListBlock() {
-        const orderedListMarkupToken = this.eat('ORDERED LIST MARKUP');
+        const orderedListMarkupToken = this.eatToken('ORDERED LIST MARKUP');
         const orderedListBlockValue = [{
                 name: orderedListMarkupToken.name,
                 value: orderedListMarkupToken.value,
             }];
-        if (this.lookahead) {
-            orderedListBlockValue.push(this.getText());
+        if (this.lookahead && this.lookahead.name === 'TEXT') {
+            // orderedListBlockValue.push(this.getText());
         }
-        while (this.lookahead) {
+        while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
             orderedListBlockValue.push(this.getNewIndentedBlockTrigger());
             orderedListBlockValue.push(this.getBlock());
         }
@@ -182,15 +182,15 @@ class Parser {
         };
     }
     getHorizontalRuleBlock() {
-        const horizontalRuleMarkupToken = this.eat(markup_tokens_1.HORIZONTAL_RULE_MARKUP_TOKEN.name);
+        const horizontalRuleMarkupToken = this.eatToken(markup_tokens_1.HORIZONTAL_RULE_MARKUP_TOKEN.name);
         const horizontalRuleBlockValue = [{
                 name: horizontalRuleMarkupToken.name,
                 value: horizontalRuleMarkupToken.value,
             }];
-        if (this.lookahead) {
-            horizontalRuleBlockValue.push(this.getText());
+        if (this.lookahead && this.lookahead.name === 'TEXT') {
+            // horizontalRuleBlockValue.push(this.getText());
         }
-        while (this.lookahead) {
+        while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
             horizontalRuleBlockValue.push(this.getNewIndentedBlockTrigger());
             horizontalRuleBlockValue.push(this.getBlock());
         }
@@ -199,34 +199,53 @@ class Parser {
             value: horizontalRuleBlockValue,
         };
     }
-    // getParagraphBlock(): ASTNode {
-    // 	const horizontalRuleBlockValue: ASTNode[] = [];
-    // 	switch (this.lookahead!.name) {
-    // 		case 'BLANK LINE':
-    // 			horizontalRuleBlockValue.push();
-    // 		case ''
-    // 	}
-    // 	if (this.lookahead) {
-    // 		horizontalRuleBlockValue.push(this.getText());
-    // 	}
-    // 	while (this.lookahead) {
-    // 		horizontalRuleBlockValue.push(this.getNewIndentedBlockTrigger());
-    // 		horizontalRuleBlockValue.push(this.getBlock());
-    // 	}
-    // 	return {
-    // 		name: 'HORIZONTAL RULE BLOCK',
-    // 		value: horizontalRuleBlockValue,
-    // 	};
-    // }
-    // getImage(): ASTNode {
-    // }
-    eat(tokenName) {
+    getParagraphBlock() {
+        const paragraphBlockValue = [];
+        if (this.lookahead.name === 'BLANK LINE') {
+            // paragraphBlockValue.push(this.getBlankLine());
+        }
+        else {
+            // paragraphBlockValue.push(this.getText());
+        }
+        while (this.lookahead && this.lookahead.name === 'NEW INDENTED BLOCK TRIGGER') {
+            paragraphBlockValue.push(this.getNewIndentedBlockTrigger());
+            paragraphBlockValue.push(this.getBlock());
+        }
+        return {
+            name: 'PARAGRAPH BLOCK',
+            value: paragraphBlockValue,
+        };
+    }
+    getImage() {
+        const imageMarkup1Token = this.eatToken(markup_tokens_1.IMAGE_MARKUP_1_TOKEN.name);
+        const imagePathToken = this.eatToken('IMAGE PATH');
+        const imageMarkup2Token = this.eatToken(markup_tokens_1.IMAGE_MARKUP_2_TOKEN.name);
+        const imageValue = [
+            {
+                name: imageMarkup1Token.name,
+                value: imageMarkup1Token.value,
+            },
+            {
+                name: imagePathToken.name,
+                value: imagePathToken.value,
+            },
+            {
+                name: imageMarkup1Token.name,
+                value: imageMarkup2Token.value,
+            },
+        ];
+        return {
+            name: 'IMAGE',
+            value: imageValue,
+        };
+    }
+    eatToken(tokenName) {
         const token = this.lookahead;
         if (token == null) {
             throw new SyntaxError(`Unexpected end of input, expected: "${tokenName}"`);
         }
         if (token.name !== tokenName) {
-            throw new SyntaxError(`Unexpected end of input, expected: "${tokenName}"`);
+            throw new SyntaxError(`Unexpected token ${token.value}, expected: "${tokenName}"`);
         }
         this.lookahead = this.lexer.getNextToken();
         return token;

@@ -10,11 +10,13 @@ class Lexer {
 	blocksAndTriggers: string[];
     cursor: number[];
     tokenQueue: Token[];
+	ignoredPatterns: Map<string, number>;
 
     constructor() {
 		this.blocksAndTriggers = [];
         this.cursor = [0, 0];
 		this.tokenQueue = [];
+		this.ignoredPatterns = new Map();
     }
 
     processUserInput(userInput: string) {
@@ -164,13 +166,10 @@ class Lexer {
     getTokensFromRemainingText(remainingText: string): Token[] {
 		let tokens: Token[] = [];
 
-		const inlinePattern = new RegExp(
-				`${IMAGE_MARKUP_PATTERN.source}|${BOLD_TEXT_PATTERN.source}|${ITALIC_TEXT_PATTERN.source}|${UNDERLINED_TEXT_PATTERN.source}|${HIGHLIGHTED_TEXT_PATTERN.source}|${STRIKETHROUGH_TEXT_PATTERN.source}|${LINK_PATTERN.source}`, // and image?
-		);
+		const inlinePattern = this.getUpdatedInlinePattern();
+		const matchedResult = remainingText.match(inlinePattern);
 
-		const inlineMatch = remainingText.match(inlinePattern);
-
-		if (!inlineMatch) {
+		if (!matchedResult) {
 			tokens = [
 				{
 					name: 'TEXT',
@@ -179,7 +178,7 @@ class Lexer {
 			];
 			this.adjustCursor(false, remainingText.length);
 		} else {
-			const inline = inlineMatch[0];
+			const inline = matchedResult[0];
 			const unmatchedTexts = remainingText.split(inline);
 
 			if (unmatchedTexts[0].length) {
@@ -195,12 +194,14 @@ class Lexer {
 			if (inline.startsWith(IMAGE_MARKUP_1_TOKEN.value)) {
 				tokens.push(...this.getTokensFromImageMarkup(inline));
 			} else if (inline.startsWith(LEFT_BOLD_TEXT_MARKUP_TOKEN.value)) {
+				this.ignoredPatterns.set(BOLD_TEXT_PATTERN.source, this.ignoredPatterns.size + 1);
 				tokens.push(
 					LEFT_BOLD_TEXT_MARKUP_TOKEN,
 					...this.getTokensFromRemainingText(inline.substring(LEFT_BOLD_TEXT_MARKUP_TOKEN.value.length, inline.length - RIGHT_BOLD_TEXT_MARKUP_TOKEN.value.length)),
 					RIGHT_BOLD_TEXT_MARKUP_TOKEN,
 				);
 				this.adjustCursor(false, LEFT_BOLD_TEXT_MARKUP_TOKEN.value.length + RIGHT_BOLD_TEXT_MARKUP_TOKEN.value.length);
+				this.ignoredPatterns.delete(BOLD_TEXT_PATTERN.source);
 			} else if (inline.startsWith(LEFT_ITALIC_TEXT_MARKUP_TOKEN.value)) {
 				tokens.push(
 					LEFT_ITALIC_TEXT_MARKUP_TOKEN,
@@ -253,6 +254,29 @@ class Lexer {
 		}
 
 		return tokens;
+	}
+
+	getUpdatedInlinePattern() {
+		const inlinePatterns = new Map([[IMAGE_MARKUP_PATTERN.source, 0], [BOLD_TEXT_PATTERN.source, 1], [ITALIC_TEXT_PATTERN.source, 2], [UNDERLINED_TEXT_PATTERN.source, 3], [HIGHLIGHTED_TEXT_PATTERN.source, 4], [STRIKETHROUGH_TEXT_PATTERN.source, 5], [LINK_PATTERN.source, 6]]);
+
+		for (const key of this.ignoredPatterns.keys()) {
+			inlinePatterns.delete(key);
+		}
+
+		let isFirstIteration = true;
+		let inlinePatternsRegExpString = '';
+		for (const key of inlinePatterns.keys()) {
+			if (isFirstIteration) {
+				inlinePatternsRegExpString = `${key}`;
+				isFirstIteration = false;
+			} else {
+				inlinePatternsRegExpString += `|${key}`;
+			}
+		}
+
+		return new RegExp(
+			inlinePatternsRegExpString,
+		);
 	}
 
 	adjustCursor(shouldIncrement: boolean, offset: number) {

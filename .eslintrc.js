@@ -16,8 +16,9 @@ module.exports = {
     'max-len': 'off',
     'no-console': 'off',
     'no-plusplus': 'off',
+	'no-restricted-syntax': 'off', //
     'no-tabs': 'off',
-    'no-useless-escape': 'off'
+    'no-useless-escape': 'off',
   },
   settings: {
     'import/resolver': {

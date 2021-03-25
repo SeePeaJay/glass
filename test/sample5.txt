@@ -1,3 +1,7 @@
-Here is a normal paragraph.
+Pre-operational stage is the second Piagetian stage, in which
+	children understand the abstraction of objects and events,
+but still struggle to think about abstract concepts, like
+	the minds of other people (thereby lacking a theory of mind), and
+	fail to logically manipulate objects in their mind.
 
-									But this paragraph is preceded by unnecessary tab characters.
+	They stay in this stage ...
