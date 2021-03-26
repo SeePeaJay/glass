@@ -152,61 +152,101 @@ class Lexer {
             this.adjustCursor(false, remainingText.length);
         }
         else {
-            const inline = matchedResult[0];
-            const unmatchedTexts = remainingText.split(inline);
-            if (unmatchedTexts[0].length) {
+            const inlineElement = matchedResult[0];
+            const unmatchedTexts = remainingText.split(inlineElement);
+            if (unmatchedTexts[0].length) { // any preceding text
                 tokens.push({
                     name: 'TEXT',
                     value: unmatchedTexts[0],
                 });
                 this.adjustCursor(false, unmatchedTexts[0].length);
             }
-            if (inline.startsWith(markup_tokens_1.IMAGE_MARKUP_1_TOKEN.value)) {
-                tokens.push(...this.getTokensFromImageMarkup(inline));
+            if (inlineElement.startsWith(markup_tokens_1.IMAGE_MARKUP_1_TOKEN.value)) {
+                tokens.push(...this.getTokensFromImageMarkup(inlineElement));
             }
-            else if (inline.startsWith(markup_tokens_1.LEFT_BOLD_TEXT_MARKUP_TOKEN.value)) {
-                this.ignoredPatterns.set(patterns_1.BOLD_TEXT_PATTERN.source, this.ignoredPatterns.size + 1);
-                tokens.push(markup_tokens_1.LEFT_BOLD_TEXT_MARKUP_TOKEN, ...this.getTokensFromRemainingText(inline.substring(markup_tokens_1.LEFT_BOLD_TEXT_MARKUP_TOKEN.value.length, inline.length - markup_tokens_1.RIGHT_BOLD_TEXT_MARKUP_TOKEN.value.length)), markup_tokens_1.RIGHT_BOLD_TEXT_MARKUP_TOKEN);
-                this.adjustCursor(false, markup_tokens_1.LEFT_BOLD_TEXT_MARKUP_TOKEN.value.length + markup_tokens_1.RIGHT_BOLD_TEXT_MARKUP_TOKEN.value.length);
-                this.ignoredPatterns.delete(patterns_1.BOLD_TEXT_PATTERN.source);
+            else if (inlineElement.startsWith(markup_tokens_1.LEFT_BOLD_TEXT_MARKUP_TOKEN.value)) {
+                tokens.push(...this.getTokensFromBoldText(inlineElement));
             }
-            else if (inline.startsWith(markup_tokens_1.LEFT_ITALIC_TEXT_MARKUP_TOKEN.value)) {
-                tokens.push(markup_tokens_1.LEFT_ITALIC_TEXT_MARKUP_TOKEN, ...this.getTokensFromRemainingText(inline.substring(markup_tokens_1.LEFT_ITALIC_TEXT_MARKUP_TOKEN.value.length, inline.length - markup_tokens_1.RIGHT_ITALIC_TEXT_MARKUP_TOKEN.value.length)), markup_tokens_1.RIGHT_ITALIC_TEXT_MARKUP_TOKEN);
-                this.adjustCursor(false, markup_tokens_1.LEFT_ITALIC_TEXT_MARKUP_TOKEN.value.length + markup_tokens_1.RIGHT_ITALIC_TEXT_MARKUP_TOKEN.value.length);
+            else if (inlineElement.startsWith(markup_tokens_1.LEFT_ITALIC_TEXT_MARKUP_TOKEN.value)) {
+                tokens.push(...this.getTokensFromItalicText(inlineElement));
             }
-            else if (inline.startsWith(markup_tokens_1.LEFT_UNDERLINED_TEXT_MARKUP_TOKEN.value) && inline.endsWith(markup_tokens_1.RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN.value)) {
-                tokens.push(markup_tokens_1.LEFT_UNDERLINED_TEXT_MARKUP_TOKEN, ...this.getTokensFromRemainingText(inline.substring(markup_tokens_1.LEFT_UNDERLINED_TEXT_MARKUP_TOKEN.value.length, inline.length - markup_tokens_1.RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN.value.length)), markup_tokens_1.RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN);
-                this.adjustCursor(false, markup_tokens_1.LEFT_UNDERLINED_TEXT_MARKUP_TOKEN.value.length + markup_tokens_1.RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN.value.length);
+            else if (inlineElement.startsWith(markup_tokens_1.LEFT_UNDERLINED_TEXT_MARKUP_TOKEN.value) && inlineElement.endsWith(markup_tokens_1.RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN.value)) {
+                tokens.push(...this.getTokensFromUnderlinedText(inlineElement));
             }
-            else if (inline.startsWith(markup_tokens_1.LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value)) {
-                tokens.push(markup_tokens_1.LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, ...this.getTokensFromRemainingText(inline.substring(markup_tokens_1.LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value.length, inline.length - markup_tokens_1.RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value.length)), markup_tokens_1.RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN);
-                this.adjustCursor(false, markup_tokens_1.LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value.length + markup_tokens_1.RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value.length);
+            else if (inlineElement.startsWith(markup_tokens_1.LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value)) {
+                tokens.push(...this.getTokensFromHighlightedText(inlineElement));
             }
-            else if (inline.startsWith(markup_tokens_1.LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value)) {
-                tokens.push(markup_tokens_1.LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, ...this.getTokensFromRemainingText(inline.substring(markup_tokens_1.LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value.length, inline.length - markup_tokens_1.RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value.length)), markup_tokens_1.RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN);
-                this.adjustCursor(false, markup_tokens_1.LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value.length + markup_tokens_1.RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value.length);
+            else if (inlineElement.startsWith(markup_tokens_1.LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value)) {
+                tokens.push(...this.getTokensFromStrikethroughText(inlineElement));
             }
-            else if (inline.startsWith(markup_tokens_1.LINK_MARKUP_1_TOKEN.value) && inline.endsWith(markup_tokens_1.LINK_MARKUP_3_TOKEN.value)) {
-                const firstLinkSplit = inline.split(markup_tokens_1.LINK_MARKUP_2_TOKEN.value);
-                const secondLinkSplit = firstLinkSplit[0].split(markup_tokens_1.LINK_MARKUP_1_TOKEN.value);
-                const thirdLinkSplit = firstLinkSplit[1].split(markup_tokens_1.LINK_MARKUP_3_TOKEN.value);
-                const linkChunks = [markup_tokens_1.LINK_MARKUP_1_TOKEN.value, secondLinkSplit[1], markup_tokens_1.LINK_MARKUP_2_TOKEN.value, thirdLinkSplit[0], markup_tokens_1.LINK_MARKUP_3_TOKEN.value];
-                tokens = [
-                    markup_tokens_1.LINK_MARKUP_1_TOKEN,
-                    ...this.getTokensFromRemainingText(linkChunks[1]),
-                    markup_tokens_1.LINK_MARKUP_2_TOKEN,
-                    {
-                        name: 'LINK URL',
-                        value: linkChunks[3],
-                    },
-                    markup_tokens_1.LINK_MARKUP_3_TOKEN,
-                ];
-                this.adjustCursor(false, linkChunks[0].length + linkChunks[2].length + linkChunks[3].length + linkChunks[4].length);
+            else if (inlineElement.startsWith(markup_tokens_1.LINK_MARKUP_1_TOKEN.value) && inlineElement.endsWith(markup_tokens_1.LINK_MARKUP_3_TOKEN.value)) {
+                tokens.push(...this.getTokensFromLink(inlineElement));
             }
             if (unmatchedTexts[1].length) {
                 tokens.push(...this.getTokensFromRemainingText(unmatchedTexts[1]));
             }
         }
+        return tokens;
+    }
+    getTokensFromBoldText(inlineElement) {
+        const tokens = [];
+        this.ignoredPatterns.set(patterns_1.BOLD_TEXT_PATTERN.source, this.ignoredPatterns.size + 1);
+        tokens.push(markup_tokens_1.LEFT_BOLD_TEXT_MARKUP_TOKEN, ...this.getTokensFromRemainingText(inlineElement.substring(markup_tokens_1.LEFT_BOLD_TEXT_MARKUP_TOKEN.value.length, inlineElement.length - markup_tokens_1.RIGHT_BOLD_TEXT_MARKUP_TOKEN.value.length)), markup_tokens_1.RIGHT_BOLD_TEXT_MARKUP_TOKEN);
+        this.adjustCursor(false, markup_tokens_1.LEFT_BOLD_TEXT_MARKUP_TOKEN.value.length + markup_tokens_1.RIGHT_BOLD_TEXT_MARKUP_TOKEN.value.length);
+        this.ignoredPatterns.delete(patterns_1.BOLD_TEXT_PATTERN.source);
+        return tokens;
+    }
+    getTokensFromItalicText(inlineElement) {
+        const tokens = [];
+        this.ignoredPatterns.set(patterns_1.BOLD_TEXT_PATTERN.source, this.ignoredPatterns.size + 1);
+        tokens.push(markup_tokens_1.LEFT_ITALIC_TEXT_MARKUP_TOKEN, ...this.getTokensFromRemainingText(inlineElement.substring(markup_tokens_1.LEFT_ITALIC_TEXT_MARKUP_TOKEN.value.length, inlineElement.length - markup_tokens_1.RIGHT_ITALIC_TEXT_MARKUP_TOKEN.value.length)), markup_tokens_1.RIGHT_ITALIC_TEXT_MARKUP_TOKEN);
+        this.adjustCursor(false, markup_tokens_1.LEFT_ITALIC_TEXT_MARKUP_TOKEN.value.length + markup_tokens_1.RIGHT_ITALIC_TEXT_MARKUP_TOKEN.value.length);
+        this.ignoredPatterns.delete(patterns_1.BOLD_TEXT_PATTERN.source);
+        return tokens;
+    }
+    getTokensFromUnderlinedText(inlineElement) {
+        const tokens = [];
+        this.ignoredPatterns.set(patterns_1.BOLD_TEXT_PATTERN.source, this.ignoredPatterns.size + 1);
+        tokens.push(markup_tokens_1.LEFT_UNDERLINED_TEXT_MARKUP_TOKEN, ...this.getTokensFromRemainingText(inlineElement.substring(markup_tokens_1.LEFT_UNDERLINED_TEXT_MARKUP_TOKEN.value.length, inlineElement.length - markup_tokens_1.RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN.value.length)), markup_tokens_1.RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN);
+        this.adjustCursor(false, markup_tokens_1.LEFT_UNDERLINED_TEXT_MARKUP_TOKEN.value.length + markup_tokens_1.RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN.value.length);
+        this.ignoredPatterns.delete(patterns_1.BOLD_TEXT_PATTERN.source);
+        return tokens;
+    }
+    getTokensFromHighlightedText(inlineElement) {
+        const tokens = [];
+        this.ignoredPatterns.set(patterns_1.BOLD_TEXT_PATTERN.source, this.ignoredPatterns.size + 1);
+        tokens.push(markup_tokens_1.LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, ...this.getTokensFromRemainingText(inlineElement.substring(markup_tokens_1.LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value.length, inlineElement.length - markup_tokens_1.RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value.length)), markup_tokens_1.RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN);
+        this.adjustCursor(false, markup_tokens_1.LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value.length + markup_tokens_1.RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN.value.length);
+        this.ignoredPatterns.delete(patterns_1.BOLD_TEXT_PATTERN.source);
+        return tokens;
+    }
+    getTokensFromStrikethroughText(inlineElement) {
+        const tokens = [];
+        this.ignoredPatterns.set(patterns_1.BOLD_TEXT_PATTERN.source, this.ignoredPatterns.size + 1);
+        tokens.push(markup_tokens_1.LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, ...this.getTokensFromRemainingText(inlineElement.substring(markup_tokens_1.LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value.length, inlineElement.length - markup_tokens_1.RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value.length)), markup_tokens_1.RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN);
+        this.adjustCursor(false, markup_tokens_1.LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value.length + markup_tokens_1.RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN.value.length);
+        this.ignoredPatterns.delete(patterns_1.BOLD_TEXT_PATTERN.source);
+        return tokens;
+    }
+    getTokensFromLink(inlineElement) {
+        let tokens = [];
+        this.ignoredPatterns.set(patterns_1.BOLD_TEXT_PATTERN.source, this.ignoredPatterns.size + 1);
+        const firstLinkSplit = inlineElement.split(markup_tokens_1.LINK_MARKUP_2_TOKEN.value);
+        const secondLinkSplit = firstLinkSplit[0].split(markup_tokens_1.LINK_MARKUP_1_TOKEN.value);
+        const thirdLinkSplit = firstLinkSplit[1].split(markup_tokens_1.LINK_MARKUP_3_TOKEN.value);
+        const linkChunks = [markup_tokens_1.LINK_MARKUP_1_TOKEN.value, secondLinkSplit[1], markup_tokens_1.LINK_MARKUP_2_TOKEN.value, thirdLinkSplit[0], markup_tokens_1.LINK_MARKUP_3_TOKEN.value];
+        tokens = [
+            markup_tokens_1.LINK_MARKUP_1_TOKEN,
+            ...this.getTokensFromRemainingText(linkChunks[1]),
+            markup_tokens_1.LINK_MARKUP_2_TOKEN,
+            {
+                name: 'LINK URL',
+                value: linkChunks[3],
+            },
+            markup_tokens_1.LINK_MARKUP_3_TOKEN,
+        ];
+        this.adjustCursor(false, linkChunks[0].length + linkChunks[2].length + linkChunks[3].length + linkChunks[4].length);
+        this.ignoredPatterns.delete(patterns_1.BOLD_TEXT_PATTERN.source);
         return tokens;
     }
     getUpdatedInlinePattern() {
