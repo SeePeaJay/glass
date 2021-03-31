@@ -4,7 +4,7 @@ import {
 } from './patterns';
 import {
 	HEADING_1_MARKUP_TOKEN, HEADING_2_MARKUP_TOKEN, HEADING_3_MARKUP_TOKEN, UNORDERED_LIST_MARKUP_TOKEN, HORIZONTAL_RULE_MARKUP_TOKEN, IMAGE_MARKUP_1_TOKEN, IMAGE_MARKUP_2_TOKEN, LEFT_BOLD_TEXT_MARKUP_TOKEN, RIGHT_BOLD_TEXT_MARKUP_TOKEN, LEFT_ITALIC_TEXT_MARKUP_TOKEN, RIGHT_ITALIC_TEXT_MARKUP_TOKEN, LEFT_UNDERLINED_TEXT_MARKUP_TOKEN, RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN, LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, LINK_MARKUP_1_TOKEN, LINK_MARKUP_2_TOKEN, LINK_MARKUP_3_TOKEN, BLANK_LINE_TOKEN,
-} from './markup_tokens';
+} from './markup-tokens';
 
 class Lexer {
 	blocksAndTriggers: string[];
@@ -18,6 +18,10 @@ class Lexer {
 		this.tokenQueue = [];
 		this.ignoredPatterns = new Map();
     }
+
+	setBlocksAndTriggers(blocksAndTriggers: string[]) {
+		this.blocksAndTriggers = blocksAndTriggers;
+	}
 
     processUserInput(userInput: string) {
 		this.blocksAndTriggers = [];

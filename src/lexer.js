@@ -1,13 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const patterns_1 = require("./patterns");
-const markup_tokens_1 = require("./markup_tokens");
+const markup_tokens_1 = require("./markup-tokens");
 class Lexer {
     constructor() {
         this.blocksAndTriggers = [];
         this.cursor = [0, 0];
         this.tokenQueue = [];
         this.ignoredPatterns = new Map();
+    }
+    setBlocksAndTriggers(blocksAndTriggers) {
+        this.blocksAndTriggers = blocksAndTriggers;
     }
     processUserInput(userInput) {
         this.blocksAndTriggers = [];

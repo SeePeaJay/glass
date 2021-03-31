@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lexer_1 = __importDefault(require("./lexer"));
-const markup_tokens_1 = require("./markup_tokens");
+const markup_tokens_1 = require("./markup-tokens");
 class Parser {
     constructor() {
         this.lexer = new lexer_1.default();
