@@ -1,5 +1,7 @@
+import ENGRAM_TOKEN_TYPE from './engram-token-types';
+
 export type Token = {
-    name: string,
+    name: ENGRAM_TOKEN_TYPE,
     value: string,
 };
 

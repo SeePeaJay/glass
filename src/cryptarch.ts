@@ -2,7 +2,7 @@ import CodeGenerator from './code-generator';
 import Lexer from './lexer';
 import {
 	TITLE_PATTERN, TRIGGER_PATTERN,
-} from './patterns';
+} from './engram-element-patterns';
 
 class Cryptarch {
 	engram: string;
@@ -19,10 +19,6 @@ class Cryptarch {
 		this.output = '';
 	}
 
-	setEngram(engram: string) {
-		this.engram = engram;
-	}
-
 	decodeEngram(engram: string = this.engram, outputFormat: string = 'HTML') {
 		this.engram = engram;
 		console.log(outputFormat);
@@ -32,7 +28,6 @@ class Cryptarch {
 		}
 		this.splitEngramIntoBlocksAndTriggers();
 		this.removeUnnecessaryTabsFromBlocksAndTriggers();
-		this.lexer.setBlocksAndTriggers(this.blocksAndTriggers);
 
 		this.codeGenerator.generateHTML(this.blocksAndTriggers);
 

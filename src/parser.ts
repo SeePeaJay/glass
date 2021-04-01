@@ -14,7 +14,8 @@ class Parser {
     }
 
     parse(userInput: string): ASTNode {
-        this.lexer.processUserInput(userInput);
+		console.log(userInput);
+        // this.lexer.processUserInput(userInput);
         this.lookahead = this.lexer.getNextToken();
         return this.getEngram();
     }

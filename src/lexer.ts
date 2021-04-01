@@ -1,10 +1,11 @@
 import { Token } from './types';
 import {
-	TRIGGER_PATTERN, HEADING_1_MARKUP_PATTERN, HEADING_2_MARKUP_PATTERN, HEADING_3_MARKUP_PATTERN, UNORDERED_LIST_MARKUP_PATTERN, ORDERED_LIST_MARKUP_PATTERN, HORIZONTAL_RULE_MARKUP_PATTERN, IMAGE_MARKUP_PATTERN, BOLD_TEXT_PATTERN, ITALIC_TEXT_PATTERN, UNDERLINED_TEXT_PATTERN, HIGHLIGHTED_TEXT_PATTERN, STRIKETHROUGH_TEXT_PATTERN, LINK_PATTERN,
-} from './patterns';
+	HEADING_1_MARKUP_PATTERN, HEADING_2_MARKUP_PATTERN, HEADING_3_MARKUP_PATTERN, UNORDERED_LIST_MARKUP_PATTERN, ORDERED_LIST_MARKUP_PATTERN, HORIZONTAL_RULE_MARKUP_PATTERN, IMAGE_MARKUP_PATTERN, BOLD_TEXT_PATTERN, ITALIC_TEXT_PATTERN, UNDERLINED_TEXT_PATTERN, HIGHLIGHTED_TEXT_PATTERN, STRIKETHROUGH_TEXT_PATTERN, LINK_PATTERN,
+} from './engram-element-patterns';
 import {
 	HEADING_1_MARKUP_TOKEN, HEADING_2_MARKUP_TOKEN, HEADING_3_MARKUP_TOKEN, UNORDERED_LIST_MARKUP_TOKEN, HORIZONTAL_RULE_MARKUP_TOKEN, IMAGE_MARKUP_1_TOKEN, IMAGE_MARKUP_2_TOKEN, LEFT_BOLD_TEXT_MARKUP_TOKEN, RIGHT_BOLD_TEXT_MARKUP_TOKEN, LEFT_ITALIC_TEXT_MARKUP_TOKEN, RIGHT_ITALIC_TEXT_MARKUP_TOKEN, LEFT_UNDERLINED_TEXT_MARKUP_TOKEN, RIGHT_UNDERLINED_TEXT_MARKUP_TOKEN, LEFT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, RIGHT_HIGHLIGHTED_TEXT_MARKUP_TOKEN, LEFT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, RIGHT_STRIKETHROUGH_TEXT_MARKUP_TOKEN, LINK_MARKUP_1_TOKEN, LINK_MARKUP_2_TOKEN, LINK_MARKUP_3_TOKEN, BLANK_LINE_TOKEN,
 } from './markup-tokens';
+import ENGRAM_TOKEN_TYPE from './engram-token-types';
 
 class Lexer {
 	blocksAndTriggers: string[];
@@ -19,44 +20,11 @@ class Lexer {
 		this.ignoredPatterns = new Map();
     }
 
-	setBlocksAndTriggers(blocksAndTriggers: string[]) {
+    processBlocksAndTriggers(blocksAndTriggers: string[]) {
 		this.blocksAndTriggers = blocksAndTriggers;
-	}
-
-    processUserInput(userInput: string) {
-		this.blocksAndTriggers = [];
 		this.cursor = [0, 0];
 		this.tokenQueue = [];
-
-		this.splitUserInputIntoBlocksAndTriggers(userInput);
-		this.removeUnnecessaryTabsFromBlocksAndTriggers();
-		// process tabs in blocksandtriggers here
     }
-
-    splitUserInputIntoBlocksAndTriggers(input: string) {
-		const split = input.split(TRIGGER_PATTERN); // split any instances of new (indented) block trigger
-		this.blocksAndTriggers.push(...split);
-	}
-
-	removeUnnecessaryTabsFromBlocksAndTriggers() {
-		let maxIndentLevel = 1;
-		for (let i = 1; i < this.blocksAndTriggers.length; i += 2) {
-			if (this.blocksAndTriggers[i].includes('\t')) {
-				const split = this.blocksAndTriggers[i].split(/(\n)(?!\n)/g);
-				const tabCharacters = split[2];
-				if (tabCharacters.length > maxIndentLevel) {
-					const array = [split[0], split[1], '\t'.repeat(maxIndentLevel)];
-					this.blocksAndTriggers[i] = array.join('');
-				}
-			} else {
-				maxIndentLevel = 1;
-			}
-		}
-
-		for (let j = 0; j < this.blocksAndTriggers.length; j += 2) {
-			this.blocksAndTriggers[j] = this.blocksAndTriggers[j].replace(/\t+/g, '');
-		}
-	}
 
     isEoF() {
         return this.cursor[0] === this.blocksAndTriggers.length;
@@ -137,7 +105,7 @@ class Lexer {
 			token = UNORDERED_LIST_MARKUP_TOKEN;
 		} else if (blockMarkup.match(ORDERED_LIST_MARKUP_PATTERN)) {
 			token = {
-				name: 'ORDERED LIST MARKUP',
+				name: ENGRAM_TOKEN_TYPE.ORDERED_LIST_MARKUP,
 				value: blockMarkup,
 			};
 		} else if (blockMarkup === HORIZONTAL_RULE_MARKUP_TOKEN.value) {

@@ -5,7 +5,7 @@ const cryptarch = new Cryptarch();
 describe('does title exist tests', () => {
     test('empty engram', () => {
 		const engram = '';
-		cryptarch.setEngram(engram);
+		cryptarch.decodeEngram(engram);
 		const expected = false;
         expect(cryptarch.doesTitleExist()).toStrictEqual(expected);
 	});
