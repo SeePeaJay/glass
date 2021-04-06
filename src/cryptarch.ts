@@ -23,32 +23,13 @@ class Cryptarch {
 		this.engram = engram;
 		console.log(outputFormat);
 
-		if (this.doesTitleExist()) { // processEngramIntoBlocksAndTriggers
+		if (!this.doesTitleExist()) { // processEngramIntoBlocksAndTriggers
 			this.addTitleBlockToEngram();
 		}
 		this.splitEngramIntoBlocksAndTriggers();
 		this.removeUnnecessaryTabsFromBlocksAndTriggers();
 
 		this.codeGenerator.generateHTML(this.blocksAndTriggers);
-
-		// currentHTMLBlockContainer - you need a variable that contains the code for current block, then add this to output once you are done with the block
-		// currentEndTag = ...
-		// while lexer.getNextToken is not null
-			// if heading 1 markup
-				// generate <h1>, or currentContainer += <h1>
-				// currentEndTag = </h1>
-			// if left bold markup
-				// generate <b>
-			// if text
-				// generate ...
-			// if unordered list markup
-				// current container <ul><li>
-				// currentEndTag = </li>
-			// if block trigger
-				// <close current element bracket>, or currentElement += </...>
-				// output += currentElement;
-				//
-			// use while loop for ordered and unordered lists, I think
 
 		return this.output;
     }

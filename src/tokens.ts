@@ -1,0 +1,90 @@
+import TOKEN_TYPE from './token-types';
+
+const TOKENS = {
+	HEADING_1_MARKUP: {
+		name: TOKEN_TYPE.HEADING_1_MARKUP,
+		value: '=1= ',
+	},
+	HEADING_2_MARKUP: {
+		name: TOKEN_TYPE.HEADING_2_MARKUP,
+		value: '=2= ',
+	},
+	HEADING_3_MARKUP: {
+        name: TOKEN_TYPE.HEADING_3_MARKUP,
+		value: '=3= ',
+    },
+	UNORDERED_LIST_MARKUP: {
+		name: TOKEN_TYPE.UNORDERED_LIST_MARKUP,
+		value: '* ',
+	},
+	HORIZONTAL_RULE_MARKUP: {
+		name: TOKEN_TYPE.HORIZONTAL_RULE_MARKUP,
+		value: '--- ',
+	},
+	IMAGE_MARKUP_1: {
+		name: TOKEN_TYPE.IMAGE_MARKUP_1,
+		value: 'image:',
+	},
+	IMAGE_MARKUP_2: {
+		name: TOKEN_TYPE.IMAGE_MARKUP_2,
+		value: '{}',
+	},
+	LEFT_BOLD_TEXT_MARKUP: {
+		name: TOKEN_TYPE.LEFT_BOLD_TEXT_MARKUP,
+		value: '`@',
+	},
+	RIGHT_BOLD_TEXT_MARKUP: {
+		name: TOKEN_TYPE.RIGHT_BOLD_TEXT_MARKUP,
+		value: '@`',
+	},
+	LEFT_ITALIC_TEXT_MARKUP: {
+		name: TOKEN_TYPE.LEFT_ITALIC_TEXT_MARKUP,
+		value: '`/',
+	},
+	RIGHT_ITALIC_TEXT_MARKUP: {
+	name: TOKEN_TYPE.RIGHT_ITALIC_TEXT_MARKUP,
+	value: '/`',
+	},
+	LEFT_UNDERLINED_TEXT_MARKUP: {
+	name: TOKEN_TYPE.LEFT_UNDERLINED_TEXT_MARKUP,
+	value: '`_',
+	},
+	RIGHT_UNDERLINED_TEXT_MARKUP: {
+		name: TOKEN_TYPE.RIGHT_UNDERLINED_TEXT_MARKUP,
+		value: '_`',
+	},
+	LEFT_HIGHLIGHTED_TEXT_MARKUP: {
+		name: TOKEN_TYPE.LEFT_HIGHLIGHTED_TEXT_MARKUP,
+		value: '`=',
+	},
+	RIGHT_HIGHLIGHTED_TEXT_MARKUP: {
+		name: TOKEN_TYPE.RIGHT_HIGHLIGHTED_TEXT_MARKUP,
+		value: '=`',
+	},
+	LEFT_STRIKETHROUGH_TEXT_MARKUP: {
+		name: TOKEN_TYPE.LEFT_STRIKETHROUGH_TEXT_MARKUP,
+		value: '`-',
+	},
+	RIGHT_STRIKETHROUGH_TEXT_MARKUP: {
+		name: TOKEN_TYPE.RIGHT_STRIKETHROUGH_TEXT_MARKUP,
+		value: '-`',
+	},
+	LINK_MARKUP_1: {
+		name: TOKEN_TYPE.LINK_MARKUP_1,
+		value: '`_',
+	},
+	LINK_MARKUP_2: {
+		name: TOKEN_TYPE.LINK_MARKUP_2,
+		value: '_(',
+	},
+	LINK_MARKUP_3: {
+		name: TOKEN_TYPE.LINK_MARKUP_3,
+		value: ')`',
+	},
+	BLANK_LINE: {
+		name: TOKEN_TYPE.BLANK_LINE,
+		value: '',
+	},
+};
+
+export default TOKENS;

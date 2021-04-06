@@ -4,14 +4,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lexer_1 = __importDefault(require("./lexer"));
-const markup_tokens_1 = require("./markup-tokens");
+const tokens_1 = require("./tokens");
 class Parser {
     constructor() {
         this.lexer = new lexer_1.default();
         this.lookahead = null;
     }
     parse(userInput) {
-        this.lexer.processUserInput(userInput);
+        console.log(userInput);
+        // this.lexer.processUserInput(userInput);
         this.lookahead = this.lexer.getNextToken();
         return this.getEngram();
     }
@@ -33,19 +34,19 @@ class Parser {
         let blockName = '';
         const blockValue = [];
         switch (this.lookahead.name) {
-            case markup_tokens_1.HEADING_1_MARKUP_TOKEN.name:
+            case tokens_1.HEADING_1_MARKUP_TOKEN.name:
                 blockName = 'HEADING 1 BLOCK';
                 blockValue.push(this.getHeading1Block());
                 break;
-            case markup_tokens_1.HEADING_2_MARKUP_TOKEN.name:
+            case tokens_1.HEADING_2_MARKUP_TOKEN.name:
                 blockName = 'HEADING 2 BLOCK';
                 blockValue.push(this.getHeading2Block());
                 break;
-            case markup_tokens_1.HEADING_3_MARKUP_TOKEN.name:
+            case tokens_1.HEADING_3_MARKUP_TOKEN.name:
                 blockName = 'HEADING 3 BLOCK';
                 blockValue.push(this.getHeading3Block());
                 break;
-            case markup_tokens_1.UNORDERED_LIST_MARKUP_TOKEN.name:
+            case tokens_1.UNORDERED_LIST_MARKUP_TOKEN.name:
                 blockName = 'UNORDERED LIST BLOCK';
                 blockValue.push(this.getUnorderedListBlock());
                 break;
@@ -53,7 +54,7 @@ class Parser {
                 blockName = 'ORDERED LIST BLOCK';
                 blockValue.push(this.getOrderedListBlock());
                 break;
-            case markup_tokens_1.HORIZONTAL_RULE_MARKUP_TOKEN.name:
+            case tokens_1.HORIZONTAL_RULE_MARKUP_TOKEN.name:
                 blockName = 'HORIZONTAL RULE BLOCK';
                 blockValue.push(this.getHorizontalRuleBlock());
                 break;
@@ -61,7 +62,7 @@ class Parser {
                 blockName = 'PARAGRAPH BLOCK';
                 blockValue.push(this.getParagraphBlock());
                 break;
-            case markup_tokens_1.IMAGE_MARKUP_1_TOKEN.name:
+            case tokens_1.IMAGE_MARKUP_1_TOKEN.name:
                 blockName = 'IMAGE BLOCK';
                 blockValue.push(this.getImage());
                 while (this.lookahead) {
@@ -92,7 +93,7 @@ class Parser {
         };
     }
     getHeading1Block() {
-        const heading1MarkupToken = this.eatToken(markup_tokens_1.HEADING_1_MARKUP_TOKEN.name);
+        const heading1MarkupToken = this.eatToken(tokens_1.HEADING_1_MARKUP_TOKEN.name);
         const heading1BlockValue = [{
                 name: heading1MarkupToken.name,
                 value: heading1MarkupToken.value,
@@ -110,7 +111,7 @@ class Parser {
         };
     }
     getHeading2Block() {
-        const heading2MarkupToken = this.eatToken(markup_tokens_1.HEADING_2_MARKUP_TOKEN.name);
+        const heading2MarkupToken = this.eatToken(tokens_1.HEADING_2_MARKUP_TOKEN.name);
         const heading2BlockValue = [{
                 name: heading2MarkupToken.name,
                 value: heading2MarkupToken.value,
@@ -128,7 +129,7 @@ class Parser {
         };
     }
     getHeading3Block() {
-        const heading3MarkupToken = this.eatToken(markup_tokens_1.HEADING_3_MARKUP_TOKEN.name);
+        const heading3MarkupToken = this.eatToken(tokens_1.HEADING_3_MARKUP_TOKEN.name);
         const heading3BlockValue = [{
                 name: heading3MarkupToken.name,
                 value: heading3MarkupToken.value,
@@ -146,7 +147,7 @@ class Parser {
         };
     }
     getUnorderedListBlock() {
-        const unorderedListMarkupToken = this.eatToken(markup_tokens_1.UNORDERED_LIST_MARKUP_TOKEN.name);
+        const unorderedListMarkupToken = this.eatToken(tokens_1.UNORDERED_LIST_MARKUP_TOKEN.name);
         const unorderedListBlockValue = [{
                 name: unorderedListMarkupToken.name,
                 value: unorderedListMarkupToken.value,
@@ -182,7 +183,7 @@ class Parser {
         };
     }
     getHorizontalRuleBlock() {
-        const horizontalRuleMarkupToken = this.eatToken(markup_tokens_1.HORIZONTAL_RULE_MARKUP_TOKEN.name);
+        const horizontalRuleMarkupToken = this.eatToken(tokens_1.HORIZONTAL_RULE_MARKUP_TOKEN.name);
         const horizontalRuleBlockValue = [{
                 name: horizontalRuleMarkupToken.name,
                 value: horizontalRuleMarkupToken.value,
@@ -217,9 +218,9 @@ class Parser {
         };
     }
     getImage() {
-        const imageMarkup1Token = this.eatToken(markup_tokens_1.IMAGE_MARKUP_1_TOKEN.name);
+        const imageMarkup1Token = this.eatToken(tokens_1.IMAGE_MARKUP_1_TOKEN.name);
         const imagePathToken = this.eatToken('IMAGE PATH');
-        const imageMarkup2Token = this.eatToken(markup_tokens_1.IMAGE_MARKUP_2_TOKEN.name);
+        const imageMarkup2Token = this.eatToken(tokens_1.IMAGE_MARKUP_2_TOKEN.name);
         const imageValue = [
             {
                 name: imageMarkup1Token.name,

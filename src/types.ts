@@ -1,4 +1,4 @@
-import ENGRAM_TOKEN_TYPE from './engram-token-types';
+import ENGRAM_TOKEN_TYPE from './token-types';
 
 export type Token = {
     name: ENGRAM_TOKEN_TYPE,
