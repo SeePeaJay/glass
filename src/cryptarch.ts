@@ -1,8 +1,6 @@
 import CodeGenerator from './code-generator';
 import Lexer from './lexer';
-import {
-	TITLE_PATTERN, TRIGGER_PATTERN,
-} from './engram-element-patterns';
+import { PATTERNS } from './constants';
 
 class Cryptarch {
 	engram: string;
@@ -35,7 +33,7 @@ class Cryptarch {
     }
 
 	doesTitleExist() {
-		if (this.engram.match(TITLE_PATTERN)) {
+		if (this.engram.match(PATTERNS.TITLE)) {
 			return true;
 		}
 		return false;
@@ -46,7 +44,7 @@ class Cryptarch {
 	}
 
 	splitEngramIntoBlocksAndTriggers() {
-		const blocksAndTriggers = this.engram.split(TRIGGER_PATTERN);
+		const blocksAndTriggers = this.engram.split(PATTERNS.NEW_BLOCK_TRIGGER);
 		this.blocksAndTriggers.push(...blocksAndTriggers);
 	}
 

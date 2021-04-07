@@ -1,7 +1,7 @@
-import ENGRAM_TOKEN_TYPE from './token-types';
+import { TOKEN_TYPE } from './constants';
 
 export type Token = {
-    name: ENGRAM_TOKEN_TYPE,
+    name: TOKEN_TYPE,
     value: string,
 };
 

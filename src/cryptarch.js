@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const code_generator_1 = __importDefault(require("./code-generator"));
 const lexer_1 = __importDefault(require("./lexer"));
-const engram_element_patterns_1 = require("./engram-element-patterns");
+const constants_1 = require("./constants");
 class Cryptarch {
     constructor() {
         this.engram = '';
@@ -26,7 +26,7 @@ class Cryptarch {
         return this.output;
     }
     doesTitleExist() {
-        if (this.engram.match(engram_element_patterns_1.TITLE_PATTERN)) {
+        if (this.engram.match(constants_1.PATTERNS.TITLE)) {
             return true;
         }
         return false;
@@ -35,7 +35,7 @@ class Cryptarch {
         this.engram = `\n===\n\n${this.engram}`;
     }
     splitEngramIntoBlocksAndTriggers() {
-        const blocksAndTriggers = this.engram.split(engram_element_patterns_1.TRIGGER_PATTERN);
+        const blocksAndTriggers = this.engram.split(constants_1.PATTERNS.NEW_BLOCK_TRIGGER);
         this.blocksAndTriggers.push(...blocksAndTriggers);
     }
     removeUnnecessaryTabsFromBlocksAndTriggers() {

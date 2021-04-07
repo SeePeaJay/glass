@@ -1,9 +1,5 @@
 import { Token } from './types';
-import {
-	HEADING_1_MARKUP_PATTERN, HEADING_2_MARKUP_PATTERN, HEADING_3_MARKUP_PATTERN, UNORDERED_LIST_MARKUP_PATTERN, ORDERED_LIST_MARKUP_PATTERN, HORIZONTAL_RULE_MARKUP_PATTERN, IMAGE_MARKUP_PATTERN, BOLD_TEXT_PATTERN, ITALIC_TEXT_PATTERN, UNDERLINED_TEXT_PATTERN, HIGHLIGHTED_TEXT_PATTERN, STRIKETHROUGH_TEXT_PATTERN, LINK_PATTERN,
-} from './engram-element-patterns';
-import TOKENS from './tokens';
-import TOKEN_TYPE from './token-types';
+import { TOKENS, TOKEN_TYPE, PATTERNS } from './constants';
 
 class Lexer {
 	blocksAndTriggers: string[];
@@ -54,7 +50,7 @@ class Lexer {
 		// block markups
 		if (this.cursor[1] === 0) {
 			const blockMarkupsPattern = new RegExp(
-				`${HEADING_1_MARKUP_PATTERN.source}|${HEADING_2_MARKUP_PATTERN.source}|${HEADING_3_MARKUP_PATTERN.source}|${UNORDERED_LIST_MARKUP_PATTERN.source}|${ORDERED_LIST_MARKUP_PATTERN.source}|${HORIZONTAL_RULE_MARKUP_PATTERN.source}|^${IMAGE_MARKUP_PATTERN.source}$`,
+				`${PATTERNS.HEADING_1_MARKUP.source}|${PATTERNS.HEADING_2_MARKUP.source}|${PATTERNS.HEADING_3_MARKUP.source}|${PATTERNS.UNORDERED_LIST_MARKUP.source}|${PATTERNS.ORDERED_LIST_MARKUP.source}|${PATTERNS.HORIZONTAL_RULE_MARKUP.source}|^${PATTERNS.IMAGE.source}$`,
 			);
 			const blockMarkupMatch = this.blocksAndTriggers[this.cursor[0]].match(blockMarkupsPattern);
 			if (blockMarkupMatch) {
@@ -101,7 +97,7 @@ class Lexer {
 			token = TOKENS.HEADING_3_MARKUP;
 		} else if (blockMarkup === TOKENS.UNORDERED_LIST_MARKUP.value) {
 			token = TOKENS.UNORDERED_LIST_MARKUP;
-		} else if (blockMarkup.match(ORDERED_LIST_MARKUP_PATTERN)) {
+		} else if (blockMarkup.match(PATTERNS.ORDERED_LIST_MARKUP)) {
 			token = {
 				name: TOKEN_TYPE.ORDERED_LIST_MARKUP,
 				value: blockMarkup,
@@ -114,7 +110,7 @@ class Lexer {
 			this.tokenQueue.push(...imageTokens);
 		}
 
-		if (!blockMarkup.match(IMAGE_MARKUP_PATTERN)) {
+		if (!blockMarkup.match(PATTERNS.IMAGE)) {
 			this.adjustCursor(false, blockMarkup.length);
 		}
 		return token;
@@ -188,14 +184,14 @@ class Lexer {
 	getTokensFromBoldText(inlineElement: string) {
 		const tokens: Token[] = [];
 
-		this.ignoredPatterns.set(BOLD_TEXT_PATTERN.source, this.ignoredPatterns.size + 1);
+		this.ignoredPatterns.set(PATTERNS.BOLD_TEXT.source, this.ignoredPatterns.size + 1);
 		tokens.push(
 			TOKENS.LEFT_BOLD_TEXT_MARKUP,
 			...this.getTokensFromRemainingText(inlineElement.substring(TOKENS.LEFT_BOLD_TEXT_MARKUP.value.length, inlineElement.length - TOKENS.RIGHT_BOLD_TEXT_MARKUP.value.length)),
 			TOKENS.RIGHT_BOLD_TEXT_MARKUP,
 		);
 		this.adjustCursor(false, TOKENS.LEFT_BOLD_TEXT_MARKUP.value.length + TOKENS.RIGHT_BOLD_TEXT_MARKUP.value.length);
-		this.ignoredPatterns.delete(BOLD_TEXT_PATTERN.source);
+		this.ignoredPatterns.delete(PATTERNS.BOLD_TEXT.source);
 
 		return tokens;
 	}
@@ -203,14 +199,14 @@ class Lexer {
 	getTokensFromItalicText(inlineElement: string) {
 		const tokens: Token[] = [];
 
-		this.ignoredPatterns.set(BOLD_TEXT_PATTERN.source, this.ignoredPatterns.size + 1);
+		this.ignoredPatterns.set(PATTERNS.BOLD_TEXT.source, this.ignoredPatterns.size + 1);
 		tokens.push(
 			TOKENS.LEFT_ITALIC_TEXT_MARKUP,
 			...this.getTokensFromRemainingText(inlineElement.substring(TOKENS.LEFT_ITALIC_TEXT_MARKUP.value.length, inlineElement.length - TOKENS.RIGHT_ITALIC_TEXT_MARKUP.value.length)),
 			TOKENS.RIGHT_ITALIC_TEXT_MARKUP,
 		);
 		this.adjustCursor(false, TOKENS.LEFT_ITALIC_TEXT_MARKUP.value.length + TOKENS.RIGHT_ITALIC_TEXT_MARKUP.value.length);
-		this.ignoredPatterns.delete(BOLD_TEXT_PATTERN.source);
+		this.ignoredPatterns.delete(PATTERNS.BOLD_TEXT.source);
 
 		return tokens;
 	}
@@ -218,14 +214,14 @@ class Lexer {
 	getTokensFromUnderlinedText(inlineElement: string) {
 		const tokens: Token[] = [];
 
-		this.ignoredPatterns.set(BOLD_TEXT_PATTERN.source, this.ignoredPatterns.size + 1);
+		this.ignoredPatterns.set(PATTERNS.BOLD_TEXT.source, this.ignoredPatterns.size + 1);
 		tokens.push(
 			TOKENS.LEFT_UNDERLINED_TEXT_MARKUP,
 			...this.getTokensFromRemainingText(inlineElement.substring(TOKENS.LEFT_UNDERLINED_TEXT_MARKUP.value.length, inlineElement.length - TOKENS.RIGHT_UNDERLINED_TEXT_MARKUP.value.length)),
 			TOKENS.RIGHT_UNDERLINED_TEXT_MARKUP,
 		);
 		this.adjustCursor(false, TOKENS.LEFT_UNDERLINED_TEXT_MARKUP.value.length + TOKENS.RIGHT_UNDERLINED_TEXT_MARKUP.value.length);
-		this.ignoredPatterns.delete(BOLD_TEXT_PATTERN.source);
+		this.ignoredPatterns.delete(PATTERNS.BOLD_TEXT.source);
 
 		return tokens;
 	}
@@ -233,14 +229,14 @@ class Lexer {
 	getTokensFromHighlightedText(inlineElement: string) {
 		const tokens: Token[] = [];
 
-		this.ignoredPatterns.set(BOLD_TEXT_PATTERN.source, this.ignoredPatterns.size + 1);
+		this.ignoredPatterns.set(PATTERNS.BOLD_TEXT.source, this.ignoredPatterns.size + 1);
 		tokens.push(
 			TOKENS.LEFT_HIGHLIGHTED_TEXT_MARKUP,
 			...this.getTokensFromRemainingText(inlineElement.substring(TOKENS.LEFT_HIGHLIGHTED_TEXT_MARKUP.value.length, inlineElement.length - TOKENS.RIGHT_HIGHLIGHTED_TEXT_MARKUP.value.length)),
 			TOKENS.RIGHT_HIGHLIGHTED_TEXT_MARKUP,
 		);
 		this.adjustCursor(false, TOKENS.LEFT_HIGHLIGHTED_TEXT_MARKUP.value.length + TOKENS.RIGHT_HIGHLIGHTED_TEXT_MARKUP.value.length);
-		this.ignoredPatterns.delete(BOLD_TEXT_PATTERN.source);
+		this.ignoredPatterns.delete(PATTERNS.BOLD_TEXT.source);
 
 		return tokens;
 	}
@@ -248,14 +244,14 @@ class Lexer {
 	getTokensFromStrikethroughText(inlineElement: string) {
 		const tokens: Token[] = [];
 
-		this.ignoredPatterns.set(BOLD_TEXT_PATTERN.source, this.ignoredPatterns.size + 1);
+		this.ignoredPatterns.set(PATTERNS.BOLD_TEXT.source, this.ignoredPatterns.size + 1);
 		tokens.push(
 			TOKENS.LEFT_STRIKETHROUGH_TEXT_MARKUP,
 			...this.getTokensFromRemainingText(inlineElement.substring(TOKENS.LEFT_STRIKETHROUGH_TEXT_MARKUP.value.length, inlineElement.length - TOKENS.RIGHT_STRIKETHROUGH_TEXT_MARKUP.value.length)),
 			TOKENS.RIGHT_STRIKETHROUGH_TEXT_MARKUP,
 		);
 		this.adjustCursor(false, TOKENS.LEFT_STRIKETHROUGH_TEXT_MARKUP.value.length + TOKENS.RIGHT_STRIKETHROUGH_TEXT_MARKUP.value.length);
-		this.ignoredPatterns.delete(BOLD_TEXT_PATTERN.source);
+		this.ignoredPatterns.delete(PATTERNS.BOLD_TEXT.source);
 
 		return tokens;
 	}
@@ -263,7 +259,7 @@ class Lexer {
 	getTokensFromLink(inlineElement: string) {
 		let tokens: Token[] = [];
 
-		this.ignoredPatterns.set(BOLD_TEXT_PATTERN.source, this.ignoredPatterns.size + 1);
+		this.ignoredPatterns.set(PATTERNS.BOLD_TEXT.source, this.ignoredPatterns.size + 1);
 		const firstLinkSplit = inlineElement.split(TOKENS.LINK_MARKUP_2.value);
 		const secondLinkSplit = firstLinkSplit[0].split(TOKENS.LINK_MARKUP_1.value);
 		const thirdLinkSplit = firstLinkSplit[1].split(TOKENS.LINK_MARKUP_3.value);
@@ -279,13 +275,13 @@ class Lexer {
 			TOKENS.LINK_MARKUP_3,
 		];
 		this.adjustCursor(false, linkChunks[0].length + linkChunks[2].length + linkChunks[3].length + linkChunks[4].length);
-		this.ignoredPatterns.delete(BOLD_TEXT_PATTERN.source);
+		this.ignoredPatterns.delete(PATTERNS.BOLD_TEXT.source);
 
 		return tokens;
 	}
 
 	getUpdatedInlinePattern() {
-		const inlinePatterns = new Map([[IMAGE_MARKUP_PATTERN.source, 0], [BOLD_TEXT_PATTERN.source, 1], [ITALIC_TEXT_PATTERN.source, 2], [UNDERLINED_TEXT_PATTERN.source, 3], [HIGHLIGHTED_TEXT_PATTERN.source, 4], [STRIKETHROUGH_TEXT_PATTERN.source, 5], [LINK_PATTERN.source, 6]]);
+		const inlinePatterns = new Map([[PATTERNS.IMAGE.source, 0], [PATTERNS.BOLD_TEXT.source, 1], [PATTERNS.ITALIC_TEXT.source, 2], [PATTERNS.UNDERLINED_TEXT.source, 3], [PATTERNS.HIGHLIGHTED_TEXT.source, 4], [PATTERNS.STRIKETHROUGH_TEXT.source, 5], [PATTERNS.LINK.source, 6]]);
 
 		for (const key of this.ignoredPatterns.keys()) {
 			inlinePatterns.delete(key);
